@@ -215,11 +215,11 @@ void SmallShell::setPrevDir(char* prevDir){
 }
 
 
-bool checkFullPath(char** currPath, char** newPath) {
+bool checkFullPath(char* currPath, char* newPath) {
   int i = 0;
-  int minLen = min(string(*currPath).length(), string(*newPath).length());
+  int minLen = min(string(currPath).length(), string(newPath).length());
   for (; i < minLen; i++) {
-    if (*currPath[i] != *newPath[i]) {
+    if (currPath[i] != newPath[i]) {
       break;
     }
   }
@@ -275,7 +275,7 @@ void ChangeDirCommand::execute() {
   }
   //If the new path is the full path, set currDir equal to it
   
-  if (checkFullPath(&(smash.getCurrDir()), &args[1])) {
+  if (checkFullPath(smash.getCurrDir(), args[1])) {
     smash.setPrevDir(smash.getCurrDir());
     smash.setCurrDir(args[1]);
   }
