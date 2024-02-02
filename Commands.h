@@ -23,7 +23,7 @@ protected:
 class BuiltInCommand : public Command {
  public:
   BuiltInCommand(const char* cmd_line);
-  virtual ~BuiltInCommand() {}
+  virtual ~BuiltInCommand() = default;
 };
 
 class ExternalCommand : public Command {
