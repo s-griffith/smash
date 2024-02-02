@@ -150,6 +150,9 @@ BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command::Command(cmd_line
 Command::Command(const char* cmd_line) : m_cmd_line(cmd_line){
 
 }
+Command::~Command() {
+  m_cmd_line = nullptr;
+}
 
 
 void SmallShell::chngPrompt(const std::string newPrompt) {
