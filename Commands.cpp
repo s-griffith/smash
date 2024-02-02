@@ -204,9 +204,7 @@ char* SmallShell::getCurrDir() const {
 void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
 }
-void SmallShell::setCurrDir(string currDir) {
-  m_currDirectory = currDir.c_str();
-}
+
 
 ///TODO: write helper function that determines if the args[1] is a full or partial path. Return true if full. Check if first location (i.e., /home/) is same for both paths.
 bool checkFullPath(string currPath, string newPath) {
@@ -250,7 +248,19 @@ void ChangeDirCommand::execute() {
   }
   else {
     smash.setPrevDir(smash.getCurrDir());
-    smash.setCurrDir((string(smash.getCurrDir()) + '/' + string(args[1])));
+    //smash.setCurrDir((string(smash.getCurrDir()) + '/' + string(args[1])));
   }
+
+    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
+    if (!buffer) {
+      free(buffer);
+      perror("smash error: malloc failed"); 
+    }
+    buffer = getcwd(buffer, MAX_PATH_LEGNTH);
+    if (!buffer) {
+      free(buffer);
+      perror("smash error: getcwd failed"); 
+    }
+    cout << buffer << endl;
 }
 
