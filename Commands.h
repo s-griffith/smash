@@ -53,7 +53,7 @@ class RedirectionCommand : public Command {
 };
 
 class ChangeDirCommand : public BuiltInCommand {
-// TODO: Add your data members 
+  char** m_plastPwd;
 public:
   ChangeDirCommand(const char* cmd_line, char** plastPwd);
   virtual ~ChangeDirCommand() {}
@@ -148,6 +148,7 @@ class ChmodCommand : public BuiltInCommand {
 class SmallShell {
  private:
   std::string m_prompt;
+  char* m_prevDir;
   ///TODO: MIGHT MAKE PROBLEMS LATER ON. IF DOES, GET RID OF FLAG AND RUN SYSCALL EVERY TIME FOR PWD
   char* m_currDirectory;
   SmallShell(const std::string prompt = "smash");
@@ -168,6 +169,8 @@ class SmallShell {
   std::string getPrompt() const;
   char* getCurrDir() const;
   void setCurrDir(char* currDir);
+  char* getPrevDir() const;
+  void setPrevDir(char* prevDir);
 };
 
 #endif //SMASH_COMMAND_H_

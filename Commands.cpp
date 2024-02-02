@@ -90,7 +90,7 @@ pid_t SmallShell::m_pid = getppid();
 
 // TODO: Add your implementation for classes in Commands.h 
 
-SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_currDirectory(nullptr) {}
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {}
 
 SmallShell::~SmallShell() {
 // TODO: add your implementation
@@ -114,7 +114,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new ChangePromptCommand(cmd_line);
   }
   else if (firstWord.compare("cd") == 0) {
-    return new ChangeDirCommand(cmd_line);
+    return new ChangeDirCommand(cmd_line, &m_prevDir);
   }
 //others
   // else {
@@ -197,12 +197,10 @@ void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
 }
 
-ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line) {
-
-}
+ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
 
 void ChangeDirCommand::execute() {
-
+  SmallShell& smash = SmallShell::getInstance();
   if(smash.getCurrDir() != nullptr) {
     //change currDir
   }
