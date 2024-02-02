@@ -213,10 +213,25 @@ void SmallShell::setPrevDir(char* prevDir){
 }
 
 
-///TODO: write helper function that determines if the args[1] is a full or partial path. Return true if full. Check if first location (i.e., /home/) is same for both paths.
-bool checkFullPath(string currPath, string newPath) {
-  //use this: because if full path, one will be substring of the other
-  //string(args[1]).find(string(smash.m_currDirectory)) != std::string::npos || string(smash.m_currDirectory).find(string(args[1])) != std::string::npos
+bool checkFullPath(char** currPath, char** newPath) {
+  int minLen = min(string(*currPath).length(), string(*newPath).legnth());
+  for (int i = 0; i < minLen; i++) {
+    if (*currPath[i] != *newPath[i]) {
+      break;
+    }
+  }
+  if (i > 1) {
+    return true;
+  }
+  return false;
+}
+
+char* goUp(char* dir) {
+  if (string(dir) == "/") {
+    return "/".str_c();
+  }
+  int cut = string(dir).find_last_of("/");
+  return string(dir).substr(0, cut).c_str();
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
@@ -239,6 +254,7 @@ void ChangeDirCommand::execute() {
     if (chdir(*m_plastPwd) != 0) {
       perror("smash error: chdir failed");
     }
+    //switch current and previous directories
     char* temp = smash.getCurrDir();
     smash.setCurrDir(smash.getPrevDir());
     smash.setPrevDir(temp);
@@ -247,27 +263,21 @@ void ChangeDirCommand::execute() {
   if (chdir(args[1]) != 0) {
     perror("smash error: chdir failed");
   }
-
-  //Change curr/prev directory fields:
-  if (checkFullPath(string(smash.getCurrDir()), string(args[1]))) {
+  //If the given "path" is to go up, remove the last part of the current path
+  if (args[1] == "..") {
+    smash.setPrevDir(smash.getCurrDir());
+    smash.setCurrDir(goUp(smash.getCurrDir()));
+  }
+  //If the new path is the full path, set currDir equal to it
+  if (checkFullPath(&smash.getCurrDir(), &args[1])) {
     smash.setPrevDir(smash.getCurrDir());
     smash.setCurrDir(args[1]);
   }
+  //If not, append the new folder to the end of the current path
   else {
     smash.setPrevDir(smash.getCurrDir());
-    //smash.setCurrDir((string(smash.getCurrDir()) + '/' + string(args[1])));
+    string curr = smash.getCurrDir();
+    smash.setCurrDir((curr + '/' + string(args[1])).c_str());
   }
-
-    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
-    if (!buffer) {
-      free(buffer);
-      perror("smash error: malloc failed"); 
-    }
-    buffer = getcwd(buffer, MAX_PATH_LEGNTH);
-    if (!buffer) {
-      free(buffer);
-      perror("smash error: getcwd failed"); 
-    }
-    cout << buffer << endl;
 }
 
