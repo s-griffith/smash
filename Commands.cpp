@@ -114,9 +114,9 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new ChangePromptCommand(cmd_line);
   }
 //others
-  else {
-    return new ExternalCommand(cmd_line);
-  }
+  // else {
+  //   return new ExternalCommand(cmd_line);
+  // }
   return nullptr;
 }
 
