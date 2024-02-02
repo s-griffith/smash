@@ -205,6 +205,13 @@ void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
 }
 
+char* SmallShell::getPrevDir() const {
+  return m_prevDir;
+}
+void SmallShell::setPrevDir(char* prevDir){
+  m_prevDir = prevDir;
+}
+
 
 ///TODO: write helper function that determines if the args[1] is a full or partial path. Return true if full. Check if first location (i.e., /home/) is same for both paths.
 bool checkFullPath(string currPath, string newPath) {
