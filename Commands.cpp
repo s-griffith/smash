@@ -282,8 +282,9 @@ void ChangeDirCommand::execute() {
   //If not, append the new folder to the end of the current path
   else {
     smash.setPrevDir(smash.getCurrDir());
-    char* curr = smash.getCurrDir();
-    smash.setCurrDir((string(curr) + '/' + (string(args[1]))).c_str());
+    string newCurr = string(smash.getCurrDir()) + '/' + (string(args[1]));
+    //Figure out how to move the string into a char without allocating memory here and not being able to delete it
+    smash.setCurrDir(newCurr);
   }
 }
 
