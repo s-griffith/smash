@@ -245,7 +245,7 @@ char* goUp(char* dir) {
   }
   int cut = string(dir).find_last_of("/");
  // dir = (string(dir)).substr(0, cut).c_str();
-  dir[cut] = '/0';
+  dir[cut] = '\0';
   printf("%s", dir);
   return dir;
 }
