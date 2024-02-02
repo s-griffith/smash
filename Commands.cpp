@@ -111,7 +111,8 @@ pid_t SmallShell::m_pid = getppid();
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) { cout << "Constructor called..........\n";  }
 
 SmallShell::~SmallShell() {
-// TODO: add your implementation
+  free(m_prevDir);
+  free(m_currDirectory);
 }
 
 /**
@@ -203,8 +204,17 @@ void GetCurrDirCommand::execute() {
 char* SmallShell::getCurrDir() const {
   return m_currDirectory;
 }
-void SmallShell::setCurrDir(char* currDir) {
-  m_currDirectory = currDir;
+void SmallShell::setCurrDir(char* currDir, char* toCombine) {
+  if (toCombine == nullptr) {
+    m_currDirectory = currDir;
+    return;
+  }
+  int length = string(currDir).length() + string(toCombine).length() + 1;
+  char* temp = (char*)malloc(length * sizeof(char));
+  strcpy(temp, currDir);
+  strcat(temp, '/');
+  strcat(temp, toCombine);
+  m_currDirectory = temp;
 }
 
 char* SmallShell::getPrevDir() const {
@@ -282,9 +292,8 @@ void ChangeDirCommand::execute() {
   //If not, append the new folder to the end of the current path
   else {
     smash.setPrevDir(smash.getCurrDir());
-    string newCurr = string(smash.getCurrDir()) + '/' + (string(args[1]));
     //Figure out how to move the string into a char without allocating memory here and not being able to delete it
-    smash.setCurrDir(newCurr);
+    smash.setCurrDir(smash.getCurrDir(), args[1]);
   }
 }
 

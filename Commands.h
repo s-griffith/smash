@@ -167,7 +167,7 @@ class SmallShell {
   void chngPrompt(const std::string newPrompt = "smash");
   std::string getPrompt() const;
   char* getCurrDir() const;
-  void setCurrDir(char* currDir);
+  void setCurrDir(char* currDir, char* toCombine = nullptr);
   char* getPrevDir() const;
   void setPrevDir(char* prevDir);
 };
