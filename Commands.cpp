@@ -214,8 +214,9 @@ void SmallShell::setPrevDir(char* prevDir){
 
 
 bool checkFullPath(char** currPath, char** newPath) {
-  int minLen = min(string(*currPath).length(), string(*newPath).legnth());
-  for (int i = 0; i < minLen; i++) {
+  int i = 0;
+  int minLen = min(string(*currPath).length(), string(*newPath).length());
+  for (i; i < minLen; i++) {
     if (*currPath[i] != *newPath[i]) {
       break;
     }
@@ -228,10 +229,10 @@ bool checkFullPath(char** currPath, char** newPath) {
 
 char* goUp(char* dir) {
   if (string(dir) == "/") {
-    return "/".str_c();
+    return "/";
   }
   int cut = string(dir).find_last_of("/");
-  return string(dir).substr(0, cut).c_str();
+  return (string(dir)).substr(0, cut).c_str();
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
@@ -269,7 +270,7 @@ void ChangeDirCommand::execute() {
     smash.setCurrDir(goUp(smash.getCurrDir()));
   }
   //If the new path is the full path, set currDir equal to it
-  if (checkFullPath(&smash.getCurrDir(), &args[1])) {
+  if (checkFullPath(&(smash.getCurrDir()), &args[1])) {
     smash.setPrevDir(smash.getCurrDir());
     smash.setCurrDir(args[1]);
   }
@@ -277,7 +278,7 @@ void ChangeDirCommand::execute() {
   else {
     smash.setPrevDir(smash.getCurrDir());
     string curr = smash.getCurrDir();
-    smash.setCurrDir((curr + '/' + string(args[1])).c_str());
+    smash.setCurrDir((curr + '/' + (string(args[1]))).c_str());
   }
 }
 
