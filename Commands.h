@@ -149,7 +149,7 @@ class SmallShell {
   
   SmallShell(const std::string prompt = "smash");
  public:
-  static int m_pid;
+  static pid_t m_pid;
   Command *CreateCommand(const char* cmd_line);
   SmallShell(SmallShell const&)      = delete; // disable copy ctor
   void operator=(SmallShell const&)  = delete; // disable = operator
