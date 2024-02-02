@@ -216,7 +216,7 @@ void SmallShell::setPrevDir(char* prevDir){
 bool checkFullPath(char** currPath, char** newPath) {
   int i = 0;
   int minLen = min(string(*currPath).length(), string(*newPath).length());
-  for (i; i < minLen; i++) {
+  for (; i < minLen; i++) {
     if (*currPath[i] != *newPath[i]) {
       break;
     }
@@ -229,10 +229,12 @@ bool checkFullPath(char** currPath, char** newPath) {
 
 char* goUp(char* dir) {
   if (string(dir) == "/") {
-    return "/";
+    char* c = "/";
+    return c;
   }
   int cut = string(dir).find_last_of("/");
-  return (string(dir)).substr(0, cut).c_str();
+  string shortened = dir.substr(0, cut);
+  return shortened.c_str();
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
