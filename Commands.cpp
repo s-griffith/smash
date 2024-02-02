@@ -86,6 +86,22 @@ char** getArgs(const char* cmd_line, int* numArgs) {
   return args;
 }
 
+void firstUpdateCurrDir() {
+  SmallShell& smash = SmallShell::getInstance();
+    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
+    if (!buffer) {
+      free(buffer);
+      perror("smash error: malloc failed"); 
+    }
+    buffer = getcwd(buffer, MAX_PATH_LEGNTH);
+    if (!buffer) {
+      free(buffer);
+      perror("smash error: getcwd failed"); 
+    }
+    smash.setCurrDir(buffer);
+}
+
+
 pid_t SmallShell::m_pid = getppid();
 
 // TODO: Add your implementation for classes in Commands.h 
@@ -175,17 +191,8 @@ void ShowPidCommand::execute() {
 GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
 
 void GetCurrDirCommand::execute() {
-  SmallShell& smash = SmallShell::getInstance();
   if(smash.getCurrDir() == nullptr) {
-    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
-    if (!buffer) {
-      perror("smash error: malloc failed"); 
-    }
-    buffer = getcwd(buffer, MAX_PATH_LEGNTH);
-    if (!buffer) {
-      perror("smash error: getcwd failed"); 
-    }
-    smash.setCurrDir(buffer);
+    firstUpdateCurrDir();
   }
   cout << string(smash.getCurrDir()) << endl;
 }
@@ -197,11 +204,49 @@ void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
 }
 
+///TODO: write helper function that determines if the args[1] is a full or partial path. Return true if full. Check if first location (i.e., /home/) is same for both paths.
+bool checkFullPath(string currPath, string newPath) {
+  //use this: because if full path, one will be substring of the other
+  string(args[1]).find(string(smash.m_currDirectory)) != std::string::npos || string(smash.m_currDirectory).find(string(args[1])) != std::string::npos
+}
+
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
 
+///TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute() {
+  if(smash.getCurrDir() == nullptr) {
+    firstUpdateCurrDir();
+  }
   SmallShell& smash = SmallShell::getInstance();
-  if(smash.getCurrDir() != nullptr) {
-    //change currDir
+  int numArgs = 0;
+  char** args = getArgs(this->m_cmd_line, &numArgs);
+  if (numArgs > 2) {
+    perror("smash error: cd: too many arguments");
+  }
+  else if (*m_plastPwd == nullptr && args[1] == '-') {
+    perror("smash error: cd: OLDPWD not set");
+  }
+  else if (args[1] == '-') {
+    if (chdir(string(*m_plastPwd)) != 0) {
+      perror("smash error: chdir failed");
+    }
+    char* temp = smash.getCurrDir();
+    smash.setCurrDir(smash.getPrevDir());
+    smash.setPrevDir(temp);
+    return;
+  }
+  if (chdir(string(args[1])) != 0) {
+    perror("smash error: chdir failed");
+  }
+
+  //Change curr/prev directory fields:
+  if (checkFullPath(string(smash.getCurrDir()), string(args[1]))) {
+    smash.setPrevDir(smash.getCurrDir());
+    smash.setCurrDir(args[1]);
+  }
+  else {
+    smash.setPrevDir(smash.getCurrDir());
+    smash.setCurrDir((string(smash.getCurrDir()) + '/' + string(args[1])).c_str());
   }
 }
+
