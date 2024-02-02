@@ -201,14 +201,14 @@ void GetCurrDirCommand::execute() {
 char* SmallShell::getCurrDir() const {
   return m_currDirectory;
 }
-void SmallShell::setCurrDir(char* currDir) {
+void SmallShell::setCurrDir(const char* currDir) {
   m_currDirectory = currDir;
 }
 
 char* SmallShell::getPrevDir() const {
   return m_prevDir;
 }
-void SmallShell::setPrevDir(char* prevDir){
+void SmallShell::setPrevDir(const char* prevDir){
   m_prevDir = prevDir;
 }
 
@@ -233,8 +233,8 @@ char* goUp(char* dir) {
     return c;
   }
   int cut = string(dir).find_last_of("/");
-  string shortened = dir.substr(0, cut);
-  return shortened.c_str();
+  char* shortened = dir.substr(0, cut);
+  return shortened;
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
