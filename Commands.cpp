@@ -230,7 +230,7 @@ bool checkFullPath(char* currPath, char* newPath) {
 }
 
 char* goUp(char* dir) {
-  if (!strcmp(*dir, '/')) {
+  if (!strcmp(dir, "/")) {
     return dir;
   }
   int cut = string(dir).find_last_of("/");
