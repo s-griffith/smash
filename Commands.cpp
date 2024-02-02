@@ -76,6 +76,16 @@ void _removeBackgroundSign(char* cmd_line) {
   cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
 }
 
+char** getArgs(const char* cmd_line, int* numArgs) {
+  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
+  //initialize to nullptr?
+  if (!args) {
+   std::perror("smash error: malloc failed"); 
+  }
+  *numArgs = _parseCommandLine(cmd_line, args);
+  return args;
+}
+
 // TODO: Add your implementation for classes in Commands.h 
 
 SmallShell::SmallShell(std::string prompt) {
@@ -125,12 +135,13 @@ ChangePromptCommand::~ChangePromptCommand() {}
 void ChangePromptCommand::execute() {
   ///TODO: NOT SUPPOSED TO CHANGE ERROR MESSAGES
   int numArgs = 0;
-  char** = getArgs(this->m_cmd_line, &numArgs);
+  char** args = getArgs(this->m_cmd_line, &numArgs);
+  SmallShell& smash = SmallShell::getInstance();
   if (numArgs == 1) {
-    SmallShell& smash = SmallShell::getInstance().chngPrompt();
+    smash.chngPrompt();
   }
   else {
-    SmallShell& smash = SmallShell::getInstance().chngPrompt(string(args[1]));
+    smash.chngPrompt(string(args[1]));
   }
 }
 
@@ -145,12 +156,3 @@ void SmallShell::chngPrompt(const std::string newPrompt) {
   m_prompt = newPrompt;
 }
 
-char** getArgs(const char* cmd_line, int* numArgs) {
-  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
-  //initialize to nullptr?
-  if (!args) {
-   std::perror("smash error: malloc failed"); 
-  }
-  *numArgs = _parseCommandLine(cmd_line, args);
-  return args;
-}
