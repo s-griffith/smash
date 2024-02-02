@@ -78,6 +78,8 @@ void _removeBackgroundSign(char* cmd_line) {
   cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
 }
 
+//-------------------------------------Helper Functions-------------------------------------
+
 char** getArgs(const char* cmd_line, int* numArgs) {
   char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
   //initialize to nullptr?
@@ -103,10 +105,32 @@ void firstUpdateCurrDir() {
     smash.setCurrDir(buffer);
 }
 
+bool checkFullPath(char* currPath, char* newPath) {
+  int i = 0;
+  int minLen = min(string(currPath).length(), string(newPath).length());
+  for (; i < minLen; i++) {
+    if (currPath[i] != newPath[i]) {
+      break;
+    }
+  }
+  if (i > 1) {
+    return true;
+  }
+  return false;
+}
+
+char* goUp(char* dir) {
+  if (!strcmp(dir, "/")) {
+    return dir;
+  }
+  int cut = string(dir).find_last_of("/");
+  dir[cut] = '\0';
+  return dir;
+}
+
+//-------------------------------------SmallShell-------------------------------------
 
 pid_t SmallShell::m_pid = getppid();
-
-// TODO: Add your implementation for classes in Commands.h 
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) { cout << "Constructor called..........\n";  }
 
@@ -154,51 +178,8 @@ std::string SmallShell::getPrompt() const {
   return m_prompt;
 }
 
-ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand::BuiltInCommand(cmd_line) {}
-
-ChangePromptCommand::~ChangePromptCommand() {}
-
-void ChangePromptCommand::execute() {
-  ///TODO: NOT SUPPOSED TO CHANGE ERROR MESSAGES
-  int numArgs = 0;
-  char** args = getArgs(this->m_cmd_line, &numArgs);
-  SmallShell& smash = SmallShell::getInstance();
-  if (numArgs == 1) {
-    smash.chngPrompt();
-  }
-  else {
-    smash.chngPrompt(string(args[1]));
-  }
-}
-
-BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command::Command(cmd_line) {}
-
-Command::Command(const char* cmd_line) : m_cmd_line(cmd_line) {}
-
-Command::~Command() {
-  m_cmd_line = nullptr;
-}
-
-
 void SmallShell::chngPrompt(const std::string newPrompt) {
   m_prompt = newPrompt;
-}
-
-ShowPidCommand::ShowPidCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
-
-void ShowPidCommand::execute() {
-  SmallShell& smash = SmallShell::getInstance();
-  cout << "smash pid is " << smash.m_pid << endl;
-}
-
-GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
-
-void GetCurrDirCommand::execute() {
-  SmallShell& smash = SmallShell::getInstance();
-  if(smash.getCurrDir() == nullptr) {
-    firstUpdateCurrDir();
-  }
-  cout << string(smash.getCurrDir()) << endl;
 }
 
 char* SmallShell::getCurrDir() const {
@@ -224,31 +205,60 @@ void SmallShell::setPrevDir(char* prevDir){
   m_prevDir = prevDir;
 }
 
+//-------------------------------------Command-------------------------------------
 
-bool checkFullPath(char* currPath, char* newPath) {
-  int i = 0;
-  int minLen = min(string(currPath).length(), string(newPath).length());
-  for (; i < minLen; i++) {
-    if (currPath[i] != newPath[i]) {
-      break;
-    }
-  }
-  if (i > 1) {
-    return true;
-  }
-  return false;
+Command::Command(const char* cmd_line) : m_cmd_line(cmd_line) {}
+
+Command::~Command() {
+  m_cmd_line = nullptr;
 }
 
-char* goUp(char* dir) {
-  if (!strcmp(dir, "/")) {
-    return dir;
+//-------------------------------------BuiltInCommand-------------------------------------
+
+BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command::Command(cmd_line) {}
+
+
+//-------------------------------------ChangePromptCommand-------------------------------------
+
+ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand::BuiltInCommand(cmd_line) {}
+
+ChangePromptCommand::~ChangePromptCommand() {}
+
+void ChangePromptCommand::execute() {
+  ///TODO: NOT SUPPOSED TO CHANGE ERROR MESSAGES
+  int numArgs = 0;
+  char** args = getArgs(this->m_cmd_line, &numArgs);
+  SmallShell& smash = SmallShell::getInstance();
+  if (numArgs == 1) {
+    smash.chngPrompt();
   }
-  int cut = string(dir).find_last_of("/");
- // dir = (string(dir)).substr(0, cut).c_str();
-  dir[cut] = '\0';
-  printf("%s\n", dir);
-  return dir;
+  else {
+    smash.chngPrompt(string(args[1]));
+  }
 }
+
+//-------------------------------------ShowPidCommand-------------------------------------
+
+ShowPidCommand::ShowPidCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
+
+void ShowPidCommand::execute() {
+  SmallShell& smash = SmallShell::getInstance();
+  cout << "smash pid is " << smash.m_pid << endl;
+}
+
+//-------------------------------------GetCurrDirCommand-------------------------------------
+
+GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
+
+void GetCurrDirCommand::execute() {
+  SmallShell& smash = SmallShell::getInstance();
+  if(smash.getCurrDir() == nullptr) {
+    firstUpdateCurrDir();
+  }
+  cout << string(smash.getCurrDir()) << endl;
+}
+
+//-------------------------------------ChangeDirCommand-------------------------------------
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
 
