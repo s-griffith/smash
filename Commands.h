@@ -160,6 +160,7 @@ class SmallShell {
   ~SmallShell();
   void executeCommand(const char* cmd_line);
   void chngPrompt(const std::string newPrompt = "smash");
+  std::string getPrompt() const;
 };
 
 #endif //SMASH_COMMAND_H_
