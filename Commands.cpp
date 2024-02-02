@@ -86,7 +86,7 @@ char** getArgs(const char* cmd_line, int* numArgs) {
   return args;
 }
 
-SmallShell::getInstance().m_pid = getppid();
+SmallShell::getInstance()->m_pid = getppid();
 
 // TODO: Add your implementation for classes in Commands.h 
 
