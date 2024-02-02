@@ -201,14 +201,14 @@ void GetCurrDirCommand::execute() {
 char* SmallShell::getCurrDir() const {
   return m_currDirectory;
 }
-void SmallShell::setCurrDir(const char* currDir) {
+void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
 }
 
 char* SmallShell::getPrevDir() const {
   return m_prevDir;
 }
-void SmallShell::setPrevDir(const char* prevDir){
+void SmallShell::setPrevDir(char* prevDir){
   m_prevDir = prevDir;
 }
 
@@ -229,12 +229,10 @@ bool checkFullPath(char** currPath, char** newPath) {
 
 char* goUp(char* dir) {
   if (string(dir) == "/") {
-    char* c = "/";
-    return c;
+    return '/';
   }
   int cut = string(dir).find_last_of("/");
-  char* shortened = dir.substr(0, cut);
-  return shortened;
+  return dir.substr(0, cut);
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
