@@ -7,6 +7,7 @@
 #define COMMAND_ARGS_MAX_LENGTH (200)
 #define COMMAND_MAX_ARGS (20)
 #define WHITESPACE (" ")
+#define MAX_PATH_LEGNTH (80)
 
 class Command {
 protected:
@@ -146,7 +147,8 @@ class ChmodCommand : public BuiltInCommand {
 class SmallShell {
  private:
   std::string m_prompt;
-  
+  ///TODO: MIGHT MAKE PROBLEMS LATER ON. IF DOES, GET RID OF FLAG AND RUN SYSCALL EVERY TIME FOR PWD
+  char* m_currDirectory;
   SmallShell(const std::string prompt = "smash");
  public:
   static pid_t m_pid;
@@ -163,6 +165,8 @@ class SmallShell {
   void executeCommand(const char* cmd_line);
   void chngPrompt(const std::string newPrompt = "smash");
   std::string getPrompt() const;
+  char* getCurrDir() const;
+  void setCurrDir(char* currDir);
 };
 
 #endif //SMASH_COMMAND_H_
