@@ -191,6 +191,7 @@ void ShowPidCommand::execute() {
 GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
 
 void GetCurrDirCommand::execute() {
+  SmallShell& smash = SmallShell::getInstance();
   if(smash.getCurrDir() == nullptr) {
     firstUpdateCurrDir();
   }
@@ -207,13 +208,14 @@ void SmallShell::setCurrDir(char* currDir) {
 ///TODO: write helper function that determines if the args[1] is a full or partial path. Return true if full. Check if first location (i.e., /home/) is same for both paths.
 bool checkFullPath(string currPath, string newPath) {
   //use this: because if full path, one will be substring of the other
-  string(args[1]).find(string(smash.m_currDirectory)) != std::string::npos || string(smash.m_currDirectory).find(string(args[1])) != std::string::npos
+  //string(args[1]).find(string(smash.m_currDirectory)) != std::string::npos || string(smash.m_currDirectory).find(string(args[1])) != std::string::npos
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
 
 ///TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute() {
+  SmallShell& smash = SmallShell::getInstance();
   if(smash.getCurrDir() == nullptr) {
     firstUpdateCurrDir();
   }
@@ -223,11 +225,11 @@ void ChangeDirCommand::execute() {
   if (numArgs > 2) {
     perror("smash error: cd: too many arguments");
   }
-  else if (*m_plastPwd == nullptr && args[1] == '-') {
+  else if (*m_plastPwd == nullptr && string(args[1]) == "-") {
     perror("smash error: cd: OLDPWD not set");
   }
-  else if (args[1] == '-') {
-    if (chdir(string(*m_plastPwd)) != 0) {
+  else if (string(args[1]) == "-") {
+    if (chdir(*m_plastPwd) != 0) {
       perror("smash error: chdir failed");
     }
     char* temp = smash.getCurrDir();
@@ -235,7 +237,7 @@ void ChangeDirCommand::execute() {
     smash.setPrevDir(temp);
     return;
   }
-  if (chdir(string(args[1])) != 0) {
+  if (chdir(args[1]) != 0) {
     perror("smash error: chdir failed");
   }
 
@@ -246,7 +248,7 @@ void ChangeDirCommand::execute() {
   }
   else {
     smash.setPrevDir(smash.getCurrDir());
-    smash.setCurrDir((string(smash.getCurrDir()) + '/' + string(args[1])).c_str());
+    smash.setCurrDir((string(smash.getCurrDir()) + '/' + string(args[1])));
   }
 }
 
