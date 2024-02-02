@@ -212,7 +212,7 @@ void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   int length = string(currDir).length() + string(toCombine).length() + 1;
   char* temp = (char*)malloc(length * sizeof(char));
   strcpy(temp, currDir);
-  strcat(temp, '/');
+  strcat(temp, "/");
   strcat(temp, toCombine);
   m_currDirectory = temp;
 }
