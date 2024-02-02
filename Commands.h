@@ -146,9 +146,10 @@ class ChmodCommand : public BuiltInCommand {
 class SmallShell {
  private:
   std::string m_prompt;
-  static int m_pid;
+  
   SmallShell(const std::string prompt = "smash");
  public:
+  static int m_pid;
   Command *CreateCommand(const char* cmd_line);
   SmallShell(SmallShell const&)      = delete; // disable copy ctor
   void operator=(SmallShell const&)  = delete; // disable = operator
