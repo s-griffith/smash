@@ -90,7 +90,7 @@ pid_t SmallShell::m_pid = getppid();
 
 // TODO: Add your implementation for classes in Commands.h 
 
-SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_cd_flag(false), m_currDirectory(nullptr) {}
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_currDirectory(nullptr) {}
 
 SmallShell::~SmallShell() {
 // TODO: add your implementation
@@ -107,11 +107,14 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   if (firstWord.compare("pwd") == 0) {
     return new GetCurrDirCommand(cmd_line);
   }
-  if (firstWord.compare("showpid") == 0) {
+  else if (firstWord.compare("showpid") == 0) {
     return new ShowPidCommand(cmd_line);
   }
   else if (firstWord.compare("chprompt") == 0) {
     return new ChangePromptCommand(cmd_line);
+  }
+  else if (firstWord.compare("cd") == 0) {
+    return new ChangeDirCommand(cmd_line);
   }
 //others
   // else {
@@ -173,7 +176,7 @@ GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line) : BuiltInCommand(cmd_
 
 void GetCurrDirCommand::execute() {
   SmallShell& smash = SmallShell::getInstance();
-  if(smash.getCD() == nullptr) {
+  if(smash.getCurrDir() == nullptr) {
     char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
     if (!buffer) {
       perror("smash error: malloc failed"); 
@@ -182,9 +185,9 @@ void GetCurrDirCommand::execute() {
     if (!buffer) {
       perror("smash error: getcwd failed"); 
     }
-    smash.setCD(buffer);
+    smash.setCurrDir(buffer);
   }
-  cout << string(smash.getCD()) << endl;
+  cout << string(smash.getCurrDir()) << endl;
 }
 
 char* SmallShell::getCurrDir() const {
@@ -192,4 +195,15 @@ char* SmallShell::getCurrDir() const {
 }
 void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
+}
+
+ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line) {
+
+}
+
+void ChangeDirCommand::execute() {
+
+  if(smash.getCurrDir() != nullptr) {
+    //change currDir
+  }
 }
