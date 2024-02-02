@@ -227,12 +227,12 @@ bool checkFullPath(char** currPath, char** newPath) {
   return false;
 }
 
-char* goUp(char* dir) {
+void goUp(char* dir) {
   if (string(dir) == "/") {
-    return dir.substr(0,dir.length());
+    return;
   }
   int cut = string(dir).find_last_of("/");
-  return dir.substr(0, cut);
+  dir = (string(dir)).substr(0, cut).c_str();
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
@@ -265,12 +265,14 @@ void ChangeDirCommand::execute() {
     perror("smash error: chdir failed");
   }
   //If the given "path" is to go up, remove the last part of the current path
+  char* currPath = smash.getCurrDir();
   if (args[1] == "..") {
     smash.setPrevDir(smash.getCurrDir());
-    smash.setCurrDir(goUp(smash.getCurrDir()));
+    smash.setCurrDir(goUp(currPath));
   }
   //If the new path is the full path, set currDir equal to it
-  if (checkFullPath(&(smash.getCurrDir()), &args[1])) {
+  
+  if (checkFullPath(&(currPath), &args[1])) {
     smash.setPrevDir(smash.getCurrDir());
     smash.setCurrDir(args[1]);
   }
