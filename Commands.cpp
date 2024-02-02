@@ -9,6 +9,8 @@
 
 using namespace std;
 
+const std::string WHITESPACE = " \n\r\t\f\v";
+
 #if 0
 #define FUNC_ENTRY()  \
   cout << __PRETTY_FUNCTION__ << " --> " << endl;
@@ -228,12 +230,13 @@ bool checkFullPath(char** currPath, char** newPath) {
 }
 
 char* goUp(char* dir) {
-  string strTemp = dir;
-  if (strTemp == "/") {
-    return strTemp.c_str();
+  if (dir == "/") {
+    return dir;
   }
   int cut = string(dir).find_last_of("/");
-  dir = (string(dir)).substr(0, cut).c_str();
+ // dir = (string(dir)).substr(0, cut).c_str();
+  strncpy(dir, dir, cut);
+  return dir;
 }
 
 ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
@@ -266,10 +269,9 @@ void ChangeDirCommand::execute() {
     perror("smash error: chdir failed");
   }
   //If the given "path" is to go up, remove the last part of the current path
-  char* currPath = smash.getCurrDir();
   if (args[1] == "..") {
     smash.setPrevDir(smash.getCurrDir());
-    smash.setCurrDir(goUp(currPath));
+    smash.setCurrDir(goUp(smash.getCurrDir()));
   }
   //If the new path is the full path, set currDir equal to it
   

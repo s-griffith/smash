@@ -6,7 +6,6 @@
 
 #define COMMAND_ARGS_MAX_LENGTH (200)
 #define COMMAND_MAX_ARGS (20)
-#define WHITESPACE (" ")
 #define MAX_PATH_LEGNTH (80)
 
 class Command {
