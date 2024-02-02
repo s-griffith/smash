@@ -204,6 +204,9 @@ char* SmallShell::getCurrDir() const {
 void SmallShell::setCurrDir(char* currDir) {
   m_currDirectory = currDir;
 }
+void SmallShell::setCurrDir(string currDir) {
+  m_currDirectory = currDir.c_str();
+}
 
 ///TODO: write helper function that determines if the args[1] is a full or partial path. Return true if full. Check if first location (i.e., /home/) is same for both paths.
 bool checkFullPath(string currPath, string newPath) {
@@ -219,7 +222,6 @@ void ChangeDirCommand::execute() {
   if(smash.getCurrDir() == nullptr) {
     firstUpdateCurrDir();
   }
-  SmallShell& smash = SmallShell::getInstance();
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   if (numArgs > 2) {

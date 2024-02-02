@@ -169,6 +169,7 @@ class SmallShell {
   std::string getPrompt() const;
   char* getCurrDir() const;
   void setCurrDir(char* currDir);
+  void setCurrDir(string currDir) //FIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   char* getPrevDir() const;
   void setPrevDir(char* prevDir);
 };
