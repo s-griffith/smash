@@ -146,6 +146,7 @@ class ChmodCommand : public BuiltInCommand {
 class SmallShell {
  private:
   std::string m_prompt;
+  static int m_pid;
   SmallShell(const std::string prompt = "smash");
  public:
   Command *CreateCommand(const char* cmd_line);

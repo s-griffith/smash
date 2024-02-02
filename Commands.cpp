@@ -86,6 +86,8 @@ char** getArgs(const char* cmd_line, int* numArgs) {
   return args;
 }
 
+SmallShell::getInstance().m_pid = getppid();
+
 // TODO: Add your implementation for classes in Commands.h 
 
 SmallShell::SmallShell(std::string prompt) {
@@ -165,5 +167,6 @@ void SmallShell::chngPrompt(const std::string newPrompt) {
 ShowPidCommand::ShowPidCommand(const char* cmd_line) : BuiltInCommand(cmd_line) {}
 
 void ShowPidCommand::execute() {
-  
+  SmallShell& smash = SmallShell::getInstance();
+  cout << "smash pid is " << smash.m_pid << endl;
 }
