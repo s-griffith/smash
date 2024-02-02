@@ -90,7 +90,7 @@ pid_t SmallShell::m_pid = getppid();
 
 // TODO: Add your implementation for classes in Commands.h 
 
-SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {}
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) { cout << "Constructor called..........\n";  }
 
 SmallShell::~SmallShell() {
 // TODO: add your implementation
