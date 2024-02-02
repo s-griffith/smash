@@ -46,6 +46,7 @@ int _parseCommandLine(const char* cmd_line, char** args) {
     memset(args[i], 0, s.length()+1);
     strcpy(args[i], s.c_str());
     args[++i] = NULL;
+    //CHECK IF MALLOC FAILED IF SO PERROR
   }
   return i;
 
@@ -77,8 +78,8 @@ void _removeBackgroundSign(char* cmd_line) {
 
 // TODO: Add your implementation for classes in Commands.h 
 
-SmallShell::SmallShell() {
-// TODO: add your implementation
+SmallShell::SmallShell(std::string prompt) {
+  m_prompt = prompt;
 }
 
 SmallShell::~SmallShell() {
@@ -115,4 +116,41 @@ void SmallShell::executeCommand(const char *cmd_line) {
   // Command* cmd = CreateCommand(cmd_line);
   // cmd->execute();
   // Please note that you must fork smash process for some commands (e.g., external commands....)
+}
+
+ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand::BuiltInCommand(cmd_line) {}
+
+ChangePromptCommand::~ChangePromptCommand() {}
+
+void ChangePromptCommand::execute() {
+  ///TODO: NOT SUPPOSED TO CHANGE ERROR MESSAGES
+  int numArgs = 0;
+  char** = getArgs(this->m_cmd_line, &numArgs);
+  if (numArgs == 1) {
+    SmallShell& smash = SmallShell::getInstance().chngPrompt();
+  }
+  else {
+    SmallShell& smash = SmallShell::getInstance().chngPrompt(string(args[1]));
+  }
+}
+
+BuiltInCommand::BuiltInCommand(const char* cmd_line) : Command::Command(cmd_line) {}
+
+Command::Command(const char* cmd_line) : m_cmd_line(cmd_line){
+
+}
+
+
+void SmallShell::chngPrompt(const std::string newPrompt) {
+  m_prompt = newPrompt;
+}
+
+char** getArgs(const char* cmd_line, int* numArgs) {
+  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
+  //initialize to nullptr?
+  if (!args) {
+   std::perror("smash error: malloc failed"); 
+  }
+  *numArgs = _parseCommandLine(cmd_line, args);
+  return args;
 }

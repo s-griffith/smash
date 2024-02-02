@@ -2,12 +2,14 @@
 #define SMASH_COMMAND_H_
 
 #include <vector>
+#include <string.h>
 
 #define COMMAND_ARGS_MAX_LENGTH (200)
 #define COMMAND_MAX_ARGS (20)
 
 class Command {
-// TODO: Add your data members
+protected:
+  const char* m_cmd_line;
  public:
   Command(const char* cmd_line);
   virtual ~Command();
@@ -67,6 +69,14 @@ class ShowPidCommand : public BuiltInCommand {
   ShowPidCommand(const char* cmd_line);
   virtual ~ShowPidCommand() {}
   void execute() override;
+};
+
+class ChangePromptCommand : public BuiltInCommand {
+public:
+  explicit ChangePromptCommand(const char* cmd_line);
+  virtual ~ChangePromptCommand();
+  void execute() override;
+
 };
 
 class JobsList;
@@ -134,8 +144,8 @@ class ChmodCommand : public BuiltInCommand {
 
 class SmallShell {
  private:
-  // TODO: Add your data members
-  SmallShell();
+  std::string m_prompt;
+  SmallShell(const std::string prompt = "smash");
  public:
   Command *CreateCommand(const char* cmd_line);
   SmallShell(SmallShell const&)      = delete; // disable copy ctor
@@ -148,7 +158,7 @@ class SmallShell {
   }
   ~SmallShell();
   void executeCommand(const char* cmd_line);
-  // TODO: add extra methods as needed
+  void chngPrompt(const std::string newPrompt = "smash");
 };
 
 #endif //SMASH_COMMAND_H_
