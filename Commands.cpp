@@ -282,8 +282,8 @@ void ChangeDirCommand::execute() {
   //If not, append the new folder to the end of the current path
   else {
     smash.setPrevDir(smash.getCurrDir());
-    string curr = smash.getCurrDir();
-    smash.setCurrDir((curr + '/' + (string(args[1]))).c_str());
+    char* curr = smash.getCurrDir();
+    smash.setCurrDir((string(curr) + '/' + (string(args[1]))).c_str());
   }
 }
 
