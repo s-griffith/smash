@@ -235,7 +235,7 @@ void SmallShell::setPrevDir(char* prevDir){
 void JobsList::printJobsList(){
   for (JobEntry element : m_list) {
      // element.job.second
-        std::cout << *(element.job.second) << endl;
+        std::cout << element.job.second.m_cmd_line << endl;
     }
 }
  JobsCommand::JobsCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
@@ -253,6 +253,10 @@ Command::Command(const char* cmd_line) : m_cmd_line(cmd_line) {}
 
 Command::~Command() {
   m_cmd_line = nullptr;
+}
+
+char* Command::gedCmdLine(){
+  return this->m_cmd_line;
 }
 
 //-------------------------------------BuiltInCommand-------------------------------------
