@@ -319,13 +319,13 @@ void ExternalCommand::execute() {
   switch (numArgs)
   {
   case 1:
-    execl(command, string(args[0]), string(args[1]), nullptr);
+    execl(command, string(args[0]), string(args[1]), (char*)0);
     break;
   case 2:
-    execl(command, string(args[0]), string(args[1]), string(args[2]), nullptr);
+    execl(command, string(args[0]), string(args[1]), string(args[2]), (char*)0);
     break;
   default:
-    execl(command, string(args[0]), nullptr);
+    execl(command, string(args[0]), (char*)0);
     break;
   }
 }
