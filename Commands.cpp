@@ -228,6 +228,7 @@ void SmallShell::setPrevDir(char* prevDir){
     int id = max_id +1;
     JobEntry newJob(max_id +1, cmd);
     this->m_list.push_back(newJob);
+    cout<<"231"<<endl;
   }
  }
 void JobsList::printJobsList(){
