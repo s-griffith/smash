@@ -105,8 +105,8 @@ class JobsList {
   int max_id = -1;
  // TODO: Add your data members
  public:
-  JobsList();
-  ~JobsList();
+  JobsList() = default;
+  ~JobsList()= default;
   void addJob(Command* cmd, bool isStopped = false);
   void printJobsList();
   void killAllJobs();

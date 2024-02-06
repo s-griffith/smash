@@ -239,6 +239,9 @@ void JobsList::printJobsList(){
     smash.getJobs()->printJobsList();
   
  }
+  //JobsList(){}
+
+
 //-------------------------------------Command-------------------------------------
 
 Command::Command(const char* cmd_line) : m_cmd_line(cmd_line) {}
