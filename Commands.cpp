@@ -255,7 +255,7 @@ Command::~Command() {
   m_cmd_line = nullptr;
 }
 
-char* Command::gedCmdLine(){
+const char* Command::gedCmdLine(){
   return this->m_cmd_line;
 }
 

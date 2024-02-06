@@ -15,7 +15,7 @@ protected:
   Command(const char* cmd_line);
   virtual ~Command();
   virtual void execute() = 0;
-  char* gedCmdLine();
+  const char* gedCmdLine();
   //virtual void prepare();
   //virtual void cleanup();
   // TODO: Add your extra methods if needed
