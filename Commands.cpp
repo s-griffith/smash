@@ -316,6 +316,7 @@ void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   string command = "/bin/" + string(args[0]);
+  fork();
   switch (numArgs)
   {
   case 1:
