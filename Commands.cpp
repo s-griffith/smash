@@ -168,6 +168,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     ChangePromptCommand cmd1("hi");
     smash.getJobs()->addJob(&cmd1);
     smash.getJobs()->printJobsList();
+
   }
 //others
   // else {
@@ -222,12 +223,16 @@ void SmallShell::setPrevDir(char* prevDir){
 
 
 //-------------------------------------Jobs-------------------------------------
- void JobsList::addJob(Command* cmd, bool isStopped){
+JobsList::JobEntry::JobEntry(int id, pid_t pid, char* cmd, bool isStopped=false): m_id(id), m_pid(pid), m_cmd(cmd), m_isStopped(isStopped){}
+ 
+ 
+ void JobsList::addJob(Command* cmd, pid_t pid bool isStopped){
   cout<<"225"<<endl;
+  removeFinishedJobs();
   if(!isStopped)
   {
     int id = max_id +1;
-    JobEntry newJob(max_id +1, cmd);
+    JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
     cout<<"231"<<endl;
   }
@@ -238,6 +243,25 @@ void JobsList::printJobsList(){
         std::cout << element.job.second->gedCmdLine() << endl;
     }
 }
+
+void JobsList::removeFinishedJobs() {
+    if (m_list.empty()) {
+        max_id = 1;
+        return;
+    }
+
+    SmallShell &shell = SmallShell::getInstance();
+    for (auto it = m_list.begin(); it != m_list.end(); ++it) {
+      auto job = *it;
+      int status;
+      int ret_wait = waitpid(job.job_pid, &status, WNOHANG);
+      if (ret_wait == job.job_pid || ret_wait == -1) {
+        m_list.erase(it);
+        --it;
+         }
+        }
+    }
+
  JobsCommand::JobsCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
  void JobsCommand::execute(){
     SmallShell& smash = SmallShell::getInstance();

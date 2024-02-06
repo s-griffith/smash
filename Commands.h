@@ -97,9 +97,12 @@ class JobsList {
  public:
   class JobEntry {
   public:
-   std::pair<int, Command*> job;
+   int m_id;
+   pid_t m_pid;
+   const char* m_cmd;
+   bool m_isStopped;
    JobEntry(){}
-   JobEntry(int id, Command* cmd):job(id, cmd){}
+   JobEntry(int id, pid_t pid, char* cmd, bool isStopped=false);
   };
   private:
   std::vector<JobEntry> m_list;
