@@ -315,11 +315,11 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  const string command = "/bin/" + string(args[0]);
+  string command = "/bin/" + string(args[0]);
   switch (numArgs)
   {
   case 1:
-    execl(command, args[0], args[1], (char*)NULL );
+    execl(command.c_str(), args[0], args[1], (char*)NULL );
     break;
   case 2:
     execl(command, string(args[0]), string(args[1]), string(args[2]), NULL);
