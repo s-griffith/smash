@@ -1,9 +1,13 @@
+#ifdef DEBUG
 #include <unistd.h>
+#endif
 #include <string.h>
 #include <iostream>
 #include <vector>
 #include <sstream>
+#ifdef DEBUG
 #include <sys/wait.h>
+#endif
 #include <iomanip>
 #include "Commands.h"
 
@@ -159,11 +163,18 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   else if (firstWord.compare("cd") == 0) {
     return new ChangeDirCommand(cmd_line, &m_prevDir);
   }
+  else if (firstWord.compare("jobs") == 0) {
+    return new JobsCommand(cmd_line);
+  }
 //others
   // else {
   //   return new ExternalCommand(cmd_line);
   // }
   return nullptr;
+}
+
+JobsList* SmallShell::getJobs(){
+  return &jobs;
 }
 
 void SmallShell::executeCommand(const char *cmd_line) {
@@ -205,6 +216,28 @@ void SmallShell::setPrevDir(char* prevDir){
   m_prevDir = prevDir;
 }
 
+
+
+//-------------------------------------Jobs-------------------------------------
+ void JobsList::addJob(Command* cmd, bool isStopped = false){
+  if(!isStopped)
+  {
+    int id = max_id +1;
+    JobEntry newJob(max_id +1, cmd);
+    this->m_list.push_back(&newJob);
+  }
+ }
+void JobsList::printJobsList(){
+  for (JobEntry* element : m_list) {
+        std::cout << element->job.second << endl;
+    }
+}
+ JobsCommand::JobsCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
+ void JobsCommand::execute(){
+    SmallShell& smash = SmallShell::getInstance();
+    smash.getJobs()->printJobsList();
+  
+ }
 //-------------------------------------Command-------------------------------------
 
 Command::Command(const char* cmd_line) : m_cmd_line(cmd_line) {}

@@ -95,8 +95,14 @@ class QuitCommand : public BuiltInCommand {
 class JobsList {
  public:
   class JobEntry {
-   // TODO: Add your data members
+  public:
+   std::pair<int, Command*> job;
+   JobEntry(){}
+   JobEntry(int id, Command* cmd):job(id, cmd){}
   };
+  private:
+  std::vector<JobEntry> m_list;
+  int max_id = -1;
  // TODO: Add your data members
  public:
   JobsList();
@@ -115,7 +121,7 @@ class JobsList {
 class JobsCommand : public BuiltInCommand {
  // TODO: Add your data members
  public:
-  JobsCommand(const char* cmd_line, JobsList* jobs);
+  JobsCommand(const char* cmd_line);
   virtual ~JobsCommand() {}
   void execute() override;
 };
@@ -151,6 +157,8 @@ class SmallShell {
   ///TODO: MIGHT MAKE PROBLEMS LATER ON. IF DOES, GET RID OF FLAG AND RUN SYSCALL EVERY TIME FOR PWD
   char* m_currDirectory;
   SmallShell(const std::string prompt = "smash");
+  JobsList jobs;
+  //std::vector<std::pair<int, std::string>> JobsList;
  public:
   static pid_t m_pid;
   Command *CreateCommand(const char* cmd_line);
@@ -163,6 +171,7 @@ class SmallShell {
     return instance;
   }
   ~SmallShell();
+  JobsList* getJobs();
   void executeCommand(const char* cmd_line);
   void chngPrompt(const std::string newPrompt = "smash");
   std::string getPrompt() const;
