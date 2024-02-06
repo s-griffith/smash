@@ -163,9 +163,9 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
 //others
-  // else {
-  //   return new ExternalCommand(cmd_line);
-  // }
+  else {
+    return new ExternalCommand(cmd_line);
+  }
   return nullptr;
 }
 
@@ -371,3 +371,23 @@ void ChangeDirCommand::execute() {
   }
 }
 
+//-------------------------------------ExternalCommand-------------------------------------
+ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
+
+void ExternalCommand::execute() {
+  int numArgs = 0;
+  char** args = getArgs(this->m_cmd_line, &numArgs);
+  string command = "/bin/" + string(args[0]);
+  switch (numArgs)
+  {
+  case 1:
+    execl(command.c_str(), args[0], args[1], (char*)0);
+    break;
+  case 2:
+    execl(command.c_str(), args[0], args[1], args[2], (char*)0);
+    break;
+  default:
+    execl(command.c_str(), args[0], (char*)0);
+    break;
+  }
+}
