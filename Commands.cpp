@@ -222,6 +222,7 @@ void SmallShell::setPrevDir(char* prevDir){
 
 //-------------------------------------Jobs-------------------------------------
  void JobsList::addJob(Command* cmd, bool isStopped){
+  cout<<"225"<<endl;
   if(!isStopped)
   {
     int id = max_id +1;
