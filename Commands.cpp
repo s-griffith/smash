@@ -325,7 +325,7 @@ void ExternalCommand::execute() {
     execl(command.c_str(), args[0], args[1], args[2], (char*)0);
     break;
   default:
-    execl(command.c_str(), args[0], (char*)0);
+    execl(command.c_str(), args[0], (char*)0); 
     break;
   }
 }
