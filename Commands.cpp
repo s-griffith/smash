@@ -223,7 +223,7 @@ void SmallShell::setPrevDir(char* prevDir){
 
 
 //-------------------------------------Jobs-------------------------------------
-JobsList::JobEntry::JobEntry(int id, pid_t pid, char* cmd, bool isStopped): m_id(id), m_pid(pid), m_cmd(cmd), m_isStopped(isStopped){}
+JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped): m_id(id), m_pid(pid), m_cmd(cmd), m_isStopped(isStopped){}
  
  
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){

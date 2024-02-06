@@ -102,7 +102,7 @@ class JobsList {
    const char* m_cmd;
    bool m_isStopped;
    JobEntry(){}
-   JobEntry(int id, pid_t pid, char* cmd, bool isStopped=false);
+   JobEntry(int id, pid_t pid, const char* cmd, bool isStopped=false);
   };
   private:
   std::vector<JobEntry> m_list;
