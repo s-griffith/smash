@@ -163,6 +163,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
   else if (firstWord.compare("add") == 0) {
+    cout<<"166"<<endl;
     SmallShell& smash = SmallShell::getInstance();
     ChangePromptCommand cmd1("hi");
     smash.getJobs()->addJob(&cmd1);
