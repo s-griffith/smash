@@ -167,6 +167,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     SmallShell& smash = SmallShell::getInstance();
     ChangePromptCommand cmd1("hi");
     smash.getJobs()->addJob(&cmd1);
+    smash.getJobs()->printJobsList();
   }
 //others
   // else {
