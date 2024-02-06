@@ -223,10 +223,10 @@ void SmallShell::setPrevDir(char* prevDir){
 
 
 //-------------------------------------Jobs-------------------------------------
-JobsList::JobEntry::JobEntry(int id, pid_t pid, char* cmd, bool isStopped=false): m_id(id), m_pid(pid), m_cmd(cmd), m_isStopped(isStopped){}
+JobsList::JobEntry::JobEntry(int id, pid_t pid, char* cmd, bool isStopped): m_id(id), m_pid(pid), m_cmd(cmd), m_isStopped(isStopped){}
  
  
- void JobsList::addJob(Command* cmd, pid_t pid bool isStopped){
+ void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
   cout<<"225"<<endl;
   removeFinishedJobs();
   if(!isStopped)
@@ -240,7 +240,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, char* cmd, bool isStopped=false)
 void JobsList::printJobsList(){
   for (JobEntry element : m_list) {
      // element.job.second
-        std::cout << element.job.second->gedCmdLine() << endl;
+        std::cout << element.m_cmd << endl;
     }
 }
 
@@ -254,8 +254,8 @@ void JobsList::removeFinishedJobs() {
     for (auto it = m_list.begin(); it != m_list.end(); ++it) {
       auto job = *it;
       int status;
-      int ret_wait = waitpid(job.job_pid, &status, WNOHANG);
-      if (ret_wait == job.job_pid || ret_wait == -1) {
+      int ret_wait = waitpid(job.m_pid, &status, WNOHANG);
+      if (ret_wait == job.m_pid || ret_wait == -1) {
         m_list.erase(it);
         --it;
          }
