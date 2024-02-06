@@ -220,7 +220,7 @@ void SmallShell::setPrevDir(char* prevDir){
 
 
 //-------------------------------------Jobs-------------------------------------
- void JobsList::addJob(Command* cmd, bool isStopped = false){
+ void JobsList::addJob(Command* cmd, bool isStopped){
   if(!isStopped)
   {
     int id = max_id +1;
