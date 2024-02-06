@@ -316,17 +316,17 @@ void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   string command = "/bin/" + string(args[0]);
-  fork();
+  pid_t child = fork();
   switch (numArgs)
   {
   case 1:
-    execl(command.c_str(), args[0], args[1], (char*)0);
+    child.execl(command.c_str(), args[0], args[1], (char*)0);
     break;
   case 2:
-    execl(command.c_str(), args[0], args[1], args[2], (char*)0);
+    child.execl(command.c_str(), args[0], args[1], args[2], (char*)0);
     break;
   default:
-    execl(command.c_str(), args[0], (char*)0); 
+    child.execl(command.c_str(), args[0], (char*)0); 
     break;
   }
 }
