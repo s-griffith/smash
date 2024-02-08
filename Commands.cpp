@@ -81,7 +81,7 @@ void _removeBackgroundSign(char* cmd_line) {
 //-------------------------------------Helper Functions-------------------------------------
 
 bool isBackGround(const char* str) {
-    size_t len = std::strlen(str);
+    size_t len = strlen(str);
     return str[len - 1] == '&';
 }
 
@@ -382,9 +382,9 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  if(isBackGround([numArgs-1])){
+  /*if(isBackGround([numArgs-1])){
 
-  }
+  }*/
   string command = "/bin/" + string(args[0]);
   pid_t pid = fork();
   if (pid == 0){
