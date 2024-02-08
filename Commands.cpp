@@ -50,7 +50,7 @@ int _parseCommandLine(const char* cmd_line, char** args) {
     args[++i] = NULL;
     //CHECK IF MALLOC FAILED IF SO PERROR
   }
-  return i-1;
+  return i;
 
   FUNC_EXIT()
 }
@@ -161,6 +161,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
+    //Can a complex command be run in the background?
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
@@ -175,6 +176,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       return new ExternalCommand(cmd_line);
     }
     else if (pid == 0 && isBackground) {
+      //Add to jobs list!!!!
       char* fixed_cmd = (char*)malloc(MAX_PATH_LENGTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
@@ -340,7 +342,13 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  string command = "/bin/" + string(args[0]);
-  execv(command.c_str(), args);
+  bool isComplex = string(this->m_cmd_line).find("*") != string::npos || string(this->m_cmd_line).find("?")!= string::npos;
+  if (isComplex) {
+    execl("/bin/bash",  "-c", args);
+  }
+  else {
+    string command = string(args[0]);//"/bin/" + string(args[0]);
+    execvp(command.c_str(), args);
+  }
   free(args);
 }
