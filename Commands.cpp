@@ -50,11 +50,6 @@ int _parseCommandLine(const char* cmd_line, char** args) {
     args[++i] = NULL;
     //CHECK IF MALLOC FAILED IF SO PERROR
   }
-  args[++i] = (char*)malloc(sizeof(char*));
-  string s = "trying";
-    memset(args[i], 0, s.length()+1);
-    strcpy(args[i], s.c_str());  
-  cout << args[i] <<endl;
   return i-1;
 
   FUNC_EXIT()
@@ -166,19 +161,20 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-    int stat;
-    pid_t pid = fork();
-    if (pid < 0) {
-      perror("smash error: fork failed");
-    }
-    if (pid == 0) {
-      return new ExternalCommand(cmd_line);
-    }
-    else {
-      if (wait(&stat) < 0) {
-        perror("smash error: wait failed");
-      }
-    }
+    return new ExternalCommand(cmd_line);
+    // int stat;
+    // pid_t pid = fork();
+    // if (pid < 0) {
+    //   perror("smash error: fork failed");
+    // }
+    // if (pid == 0) {
+    //   return new ExternalCommand(cmd_line);
+    // }
+    // else {
+    //   if (wait(&stat) < 0) {
+    //     perror("smash error: wait failed");
+    //   }
+    // }
   }
   return nullptr;
 }
