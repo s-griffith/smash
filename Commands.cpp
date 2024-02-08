@@ -161,21 +161,20 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-    return new ExternalCommand(cmd_line);
+    //return new ExternalCommand(cmd_line);
     int stat = 0;
-    pid_t pid, ppid = fork();
+    pid_t pid = fork();
     if (pid < 0) {
       perror("smash error: fork failed");
     }
+    if (pid > 0) {
+      while ((pid = wait(&stat)) > 0);
+      return nullptr;
+    }
     if (pid == 0) {
       return new ExternalCommand(cmd_line);
+      exit(0);
     }
-    while ((ppid = wait(&status)) > 0);
-    // else {
-    //   if (wait(&stat) < 0) {
-    //     perror("smash error: wait failed");
-    //   }
-    // }
   }
   return nullptr;
 }
@@ -184,6 +183,9 @@ void SmallShell::executeCommand(const char *cmd_line) {
   // TODO: Add your implementation here
   // for example:
   Command* cmd = CreateCommand(cmd_line);
+  if (!cmd) {
+    return;
+  }
   cmd->execute();
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
