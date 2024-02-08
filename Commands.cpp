@@ -80,6 +80,11 @@ void _removeBackgroundSign(char* cmd_line) {
 
 //-------------------------------------Helper Functions-------------------------------------
 
+bool isBackGround(const char* str) {
+    size_t len = std::strlen(str);
+    return str[len - 1] == '&';
+}
+
 char** getArgs(const char* cmd_line, int* numArgs) {
   char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
   //initialize to nullptr?
@@ -377,10 +382,16 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
+  if(isBackGround([numArgs-1])){
+
+  }
   string command = "/bin/" + string(args[0]);
+  pid_t pid = fork();
+  if (pid == 0){
   switch (numArgs)
   {
   case 1:
+    cout<<"394";
     execl(command.c_str(), args[0], args[1], (char*)0);
     break;
   case 2:
@@ -390,4 +401,13 @@ void ExternalCommand::execute() {
     execl(command.c_str(), args[0], (char*)0);
     break;
   }
+  }
+  else {
+        SmallShell &smash = SmallShell::getInstance();
+        if (is_background) {
+            smash.getJobs().addJob(this, pid);
+        } else {
+           
+            }
+        }
 }
