@@ -328,5 +328,5 @@ void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   string command = "/bin/" + string(args[0]);
-  execv(command.c_str(), args);
+  execvp(command.c_str(), args);
 }
