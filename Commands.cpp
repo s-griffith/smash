@@ -162,14 +162,14 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
 //others
   else {
     return new ExternalCommand(cmd_line);
-    // int stat;
-    // pid_t pid = fork();
-    // if (pid < 0) {
-    //   perror("smash error: fork failed");
-    // }
-    // if (pid == 0) {
-    //   return new ExternalCommand(cmd_line);
-    // }
+    int stat;
+    pid_t pid = fork();
+    if (pid < 0) {
+      perror("smash error: fork failed");
+    }
+    if (pid == 0) {
+      return new ExternalCommand(cmd_line);
+    }
     // else {
     //   if (wait(&stat) < 0) {
     //     perror("smash error: wait failed");
