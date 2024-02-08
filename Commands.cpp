@@ -161,7 +161,14 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-    return new ExternalCommand(cmd_line);
+    pid_t pid = fork();
+    if (pid == 0) {
+      return new ExternalCommand(cmd_line);
+    }
+    else {
+      wait();
+    }
+    
   }
   return nullptr;
 }
