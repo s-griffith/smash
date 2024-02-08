@@ -161,18 +161,27 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-    //return new ExternalCommand(cmd_line);
+    bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
     if (pid < 0) {
       perror("smash error: fork failed");
     }
-    if (pid > 0) {
+    if (pid > 0 && !isBackground) {
       while ((pid = wait(&stat)) > 0);
       return nullptr;
     }
-    if (pid == 0) {
+    if (pid == 0 && !isBackground) {
       return new ExternalCommand(cmd_line);
+      exit(0);
+    }
+    else if (pid == 0 && isBackground) {
+      char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
+      strcpy(fixed_cmd, cmd_line);
+      _removeBackgroundSign(fixed_cmd);
+      return new ExternalCommand(fixed_cmd);
+      free(fixed_cmd);
+      cout << "doing this" << endl;
       exit(0);
     }
   }
