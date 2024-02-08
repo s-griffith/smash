@@ -402,12 +402,4 @@ void ExternalCommand::execute() {
     break;
   }
   }
-  else {
-        SmallShell &smash = SmallShell::getInstance();
-        if (is_background) {
-            smash.getJobs().addJob(this, pid);
-        } else {
-           
-            }
-        }
 }
