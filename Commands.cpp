@@ -161,14 +161,19 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
+    int stat;
     pid_t pid = fork();
+    if (pid < 0) {
+      perror("smash error: fork failed");
+    }
     if (pid == 0) {
       return new ExternalCommand(cmd_line);
     }
     else {
-      wait(NULL);
+      if (wait(&stat) < 0) {
+        perror("smash error: wait failed");
+      }
     }
-    
   }
   return nullptr;
 }
@@ -320,19 +325,7 @@ void ChangeDirCommand::execute() {
 ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 
 void ExternalCommand::execute() {
-  int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   string command = "/bin/" + string(args[0]);
-  switch (numArgs)
-  {
-  case 1:
-    execl(command.c_str(), args[0], args[1], (char*)0);
-    break;
-  case 2:
-    execl(command.c_str(), args[0], args[1], args[2], (char*)0);
-    break;
-  default:
-    execl(command.c_str(), args[0], (char*)0); 
-    break;
-  }
+  execv(command.c_str(), args);
 }
