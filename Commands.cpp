@@ -92,12 +92,12 @@ char** getArgs(const char* cmd_line, int* numArgs) {
 
 void firstUpdateCurrDir() {
   SmallShell& smash = SmallShell::getInstance();
-    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
+    char* buffer = (char*)malloc(MAX_PATH_LENGTH * sizeof(char) + 1);
     if (!buffer) {
       free(buffer);
       perror("smash error: malloc failed"); 
     }
-    buffer = getcwd(buffer, MAX_PATH_LEGNTH);
+    buffer = getcwd(buffer, MAX_PATH_LENGTH);
     if (!buffer) {
       free(buffer);
       perror("smash error: getcwd failed"); 
@@ -132,7 +132,7 @@ char* goUp(char* dir) {
 
 pid_t SmallShell::m_pid = getppid();
 
-SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) { cout << "Constructor called..........\n";  }
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {}
 
 SmallShell::~SmallShell() {
   free(m_prevDir);
@@ -173,16 +173,12 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     }
     if (pid == 0 && !isBackground) {
       return new ExternalCommand(cmd_line);
-      exit(0);
     }
     else if (pid == 0 && isBackground) {
-      char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
+      char* fixed_cmd = (char*)malloc(MAX_PATH_LENGTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
       return new ExternalCommand(fixed_cmd);
-      free(fixed_cmd);
-      cout << "doing this" << endl;
-      exit(0);
     }
   }
   return nullptr;
@@ -196,6 +192,9 @@ void SmallShell::executeCommand(const char *cmd_line) {
     return;
   }
   cmd->execute();
+  if (dynamic_cast<ExternalCommand*>(cmd) != nullptr) {
+    exit(0);
+  }
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
@@ -342,5 +341,6 @@ void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   string command = "/bin/" + string(args[0]);
-  execvp(command.c_str(), args);
+  execv(command.c_str(), args);
+  free(args);
 }
