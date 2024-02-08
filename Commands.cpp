@@ -51,7 +51,7 @@ int _parseCommandLine(const char* cmd_line, char** args) {
     //CHECK IF MALLOC FAILED IF SO PERROR
   }
   args[++i] = (char*)malloc(sizeof(char*));
-  args[i] = NULL;
+  memset(args[i], NULL, sizeof(char*));
   return i;
 
   FUNC_EXIT()
@@ -83,7 +83,7 @@ void _removeBackgroundSign(char* cmd_line) {
 //-------------------------------------Helper Functions-------------------------------------
 
 char** getArgs(const char* cmd_line, int* numArgs) {
-  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
+  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**) + 1);
   //initialize to nullptr?
   if (!args) {
    perror("smash error: malloc failed"); 
@@ -249,6 +249,7 @@ void ChangePromptCommand::execute() {
   else {
     smash.chngPrompt(string(args[1]));
   }
+  free(args);
 }
 
 //-------------------------------------ShowPidCommand-------------------------------------
