@@ -386,14 +386,14 @@ void ExternalCommand::execute() {
 
   }*/
   string command = "/bin/" + string(args[0]);
+  cout<<"Ccommand : "<< command;
   pid_t pid = fork();
   if (pid == 0){
   switch (numArgs)
   {
   case 1:
-    cout<<"394";
     execl(command.c_str(), args[0], args[1], (char*)0);
-     perror("execl failed");
+    perror("execl failed");
     break;
   case 2:
     execl(command.c_str(), args[0], args[1], args[2], (char*)0);
