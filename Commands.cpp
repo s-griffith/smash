@@ -173,9 +173,11 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       return nullptr;
     }
     if (pid == 0 && !isBackground) {
+      setpgrp();
       return new ExternalCommand(cmd_line);
     }
     else if (pid == 0 && isBackground) {
+      setpgrp();
       //Add to jobs list!!!!
       char* fixed_cmd = (char*)malloc(MAX_PATH_LENGTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
@@ -344,10 +346,10 @@ void ExternalCommand::execute() {
   char** args = getArgs(this->m_cmd_line, &numArgs);
   bool isComplex = string(this->m_cmd_line).find("*") != string::npos || string(this->m_cmd_line).find("?")!= string::npos;
   if (isComplex) {
-    execl("/bin/bash",  "-c", args);
+    execl("/bin/bash", "-c", "complex-external-command", args, (char*)NULL );
   }
   else {
-    string command = string(args[0]);//"/bin/" + string(args[0]);
+    string command = string(args[0]);
     execvp(command.c_str(), args);
   }
   free(args);
