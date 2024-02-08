@@ -50,6 +50,8 @@ int _parseCommandLine(const char* cmd_line, char** args) {
     args[++i] = NULL;
     //CHECK IF MALLOC FAILED IF SO PERROR
   }
+  args[++i] = (char*)malloc(sizeof(char*));
+  args[i] = NULL;
   return i;
 
   FUNC_EXIT()
