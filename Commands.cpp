@@ -387,8 +387,8 @@ void ExternalCommand::execute() {
   }*/
   string command = "/bin/" + string(args[0]);
   cout<<"Ccommand : "<< command;
-  pid_t pid = fork();
-  if (pid == 0){
+  //pid_t pid = fork();
+  //if (pid == 0){
   switch (numArgs)
   {
   case 1:
@@ -403,4 +403,3 @@ void ExternalCommand::execute() {
     break;
   }
   }
-}
