@@ -409,7 +409,8 @@ void ExternalCommand::execute() {
   }
   else {
     string command = string(args[0]);
+    cout<<"412";
     execvp(command.c_str(), args);
   }
-  free(args);
+  free(args);//never get to here
 }
