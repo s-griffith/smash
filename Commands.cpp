@@ -190,6 +190,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
+      cout<<"193";
       return new ExternalCommand(fixed_cmd);
     }
   }
