@@ -205,7 +205,13 @@ void SmallShell::executeCommand(const char *cmd_line) {
   // TODO: Add your implementation here
   // for example:
   Command* cmd = CreateCommand(cmd_line);
+  if (!cmd) {
+    return;
+  }
   cmd->execute();
+  if (dynamic_cast<ExternalCommand*>(cmd) != nullptr) {
+    exit(0);
+  }
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
