@@ -382,13 +382,8 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  /*if(isBackGround([numArgs-1])){
-
-  }*/
   string command = "/bin/" + string(args[0]);
   cout<<"Ccommand : "<< command;
-  //pid_t pid = fork();
-  //if (pid == 0){
   switch (numArgs)
   {
   case 1:
