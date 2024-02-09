@@ -169,7 +169,6 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-      else {
     //Can a complex command be run in the background?
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
