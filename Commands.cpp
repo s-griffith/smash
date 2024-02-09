@@ -187,7 +187,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     else if (pid == 0 && isBackground) {
       setpgrp();
       //Add to jobs list!!!!
-      char* fixed_cmd = (char*)malloc(MAX_PATH_LENGTH*sizeof(char)+1);
+      char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
       return new ExternalCommand(fixed_cmd);
