@@ -169,11 +169,33 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-    return new ExternalCommand(cmd_line);
+      else {
+    //Can a complex command be run in the background?
+    bool isBackground = _isBackgroundComamnd(cmd_line);
+    int stat = 0;
+    pid_t pid = fork();
+    if (pid < 0) {
+      perror("smash error: fork failed");
+    }
+    if (pid > 0 && !isBackground) {
+      while ((pid = wait(&stat)) > 0);
+      return nullptr;
+    }
+    if (pid == 0 && !isBackground) {
+      setpgrp();
+      return new ExternalCommand(cmd_line);
+    }
+    else if (pid == 0 && isBackground) {
+      setpgrp();
+      //Add to jobs list!!!!
+      char* fixed_cmd = (char*)malloc(MAX_PATH_LENGTH*sizeof(char)+1);
+      strcpy(fixed_cmd, cmd_line);
+      _removeBackgroundSign(fixed_cmd);
+      return new ExternalCommand(fixed_cmd);
+    }
   }
   return nullptr;
 }
-
 JobsList* SmallShell::getJobs(){
   return &jobs;
 }
@@ -382,19 +404,13 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  string command = "/bin/" + string(args[0]);
-  cout<<"Ccommand : "<< command;
-  switch (numArgs)
-  {
-  case 1:
-    execl(command.c_str(), args[0], args[1], (char*)0);
-    perror("execl failed");
-    break;
-  case 2:
-    execl(command.c_str(), args[0], args[1], args[2], (char*)0);
-    break;
-  default:
-    execl(command.c_str(), args[0], (char*)0);
-    break;
+  bool isComplex = string(this->m_cmd_line).find("*") != string::npos || string(this->m_cmd_line).find("?")!= string::npos;
+  if (isComplex) {
+    execl("/bin/bash", "-c", "complex-external-command", args, (char*)NULL );
   }
+  else {
+    string command = string(args[0]);
+    execvp(command.c_str(), args);
   }
+  free(args);
+}
