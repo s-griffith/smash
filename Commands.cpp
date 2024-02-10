@@ -281,6 +281,7 @@ void JobsList::removeFinishedJobs() {
       int status;
       int ret_wait = waitpid(job.m_pid, &status, WNOHANG);
       if (ret_wait == job.m_pid || ret_wait == -1) {
+        cout<<"284";
         m_list.erase(it);
         --it;
          }
