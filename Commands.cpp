@@ -262,6 +262,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  }
 void JobsList::printJobsList(){
   cout<<m_list.size()<<"266";
+  removeFinishedJobs();
   for (JobEntry element : m_list) {
      // element.job.second
         std::cout << element.m_cmd << endl;
