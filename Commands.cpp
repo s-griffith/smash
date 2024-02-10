@@ -194,6 +194,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     }
     else if (pid == 0 && isBackground) {
       setpgrp();
+      cout<<"197";
       //Add to jobs list!!!!
       return cmd;
     }
