@@ -411,9 +411,11 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 
 void ExternalCommand::execute() {
   int numArgs = 0;
+  cout<<"414";
   char** args = getArgs(this->m_cmd_line, &numArgs);
   bool isComplex = string(this->m_cmd_line).find("*") != string::npos || string(this->m_cmd_line).find("?")!= string::npos;
   if (isComplex) {
+    cout<<"417";
     execl("/bin/bash", "-c", "complex-external-command", args, (char*)NULL );
   }
   else {
