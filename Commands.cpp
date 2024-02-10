@@ -173,11 +173,8 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
     strcpy(fixed_cmd, cmd_line);
     _removeBackgroundSign(fixed_cmd);
-
     ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
     pid_t pid = fork();
-    
-      cout<<"182"<<isBackground;
     if (pid < 0) {
       perror("smash error: fork failed");
     }
@@ -187,7 +184,6 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     }
     if (pid == 0 && !isBackground) {
       setpgrp();
-      cout<<"189";
       return cmd;
     }
     else if  (pid > 0 && isBackground){
@@ -196,8 +192,6 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     }
     else if (pid == 0 && isBackground) {
       setpgrp();
-      cout<<"197";
-      //Add to jobs list!!!!
       return cmd;
     }
   }
@@ -265,12 +259,12 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
     this->m_list.push_back(newJob);
  }
 void JobsList::printJobsList(){
-  cout<<m_list.size()<<"266";
   removeFinishedJobs();
-    cout<<m_list.size()<<"270";
+  int i=1;
   for (JobEntry element : m_list) {
      // element.job.second
-        std::cout << element.m_cmd << endl;
+        std::cout << "["<< i << "] "<< element.m_cmd << "&"<< endl;
+        i++;
     }
 }
 
