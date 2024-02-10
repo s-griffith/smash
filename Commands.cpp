@@ -172,7 +172,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     int stat = 0;
     char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
     strcpy(fixed_cmd, cmd_line);
-    removeBackgroundSign(fixed_cmd);
+    _removeBackgroundSign(fixed_cmd);
 
     ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
     pid_t pid = fork();
