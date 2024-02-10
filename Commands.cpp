@@ -166,7 +166,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
-    cout<<"172";
+
     //Can a complex command be run in the background?
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
@@ -188,7 +188,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
-      cout<<"193";
+
       ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
       SmallShell &shell = SmallShell::getInstance();
       shell.getJobs()->addJob(cmd, getpid());
@@ -260,10 +260,10 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
     int id = max_id +1;
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
-    cout<<"231"<<endl;
   }
  }
 void JobsList::printJobsList(){
+  cout<<"266";
   for (JobEntry element : m_list) {
      // element.job.second
         std::cout << element.m_cmd << endl;
