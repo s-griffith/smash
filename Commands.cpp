@@ -186,6 +186,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     }
     if (pid == 0 && !isBackground) {
       setpgrp();
+      cout<<"189";
       return cmd;
     }
     else if  (pid > 0 && isBackground){
