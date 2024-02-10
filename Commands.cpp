@@ -254,7 +254,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  
  
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
-  cout<<"225"<<endl;
+  cout<<"225////////////"<<endl;
   //removeFinishedJobs();
   cout<< "  258  ";
   if(!isStopped)
