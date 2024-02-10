@@ -176,6 +176,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       _removeBackgroundSign(fixed_cmd);
 
       ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
+      cout<<cmd->gedCmdLine();
     if (pid < 0) {
       perror("smash error: fork failed");
     }
