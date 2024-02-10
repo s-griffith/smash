@@ -192,7 +192,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     }
     else if  (pid > 0 && isBackground){
       SmallShell &shell = SmallShell::getInstance();
-      shell.getJobs()->addJob(cmd, getpid());
+      shell.getJobs()->addJob(cmd, pid);
     }
     else if (pid == 0 && isBackground) {
       setpgrp();
