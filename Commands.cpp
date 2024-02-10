@@ -171,28 +171,29 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
-    if (pid < 0) {
-      perror("smash error: fork failed");
-    }
-    if (pid > 0 && !isBackground) {
-      while ((pid = wait(&stat)) > 0);
-      return nullptr;
-    }
-    if (pid == 0 && !isBackground) {
-      setpgrp();
-      return new ExternalCommand(cmd_line);
-    }
-    else if (pid == 0 && isBackground) {
-      setpgrp();
-      //Add to jobs list!!!!
-      char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
+    char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
 
       ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
+    if (pid < 0) {
+      perror("smash error: fork failed");
+    }
+    if (pid > 0 && !isBackground) {
+      while ((pid = wait(&stat)) > 0);//if a background son will finish? maybe waitpid
+      return nullptr;
+    }
+    if (pid == 0 && !isBackground) {
+      setpgrp();
+      return cmd;
+    }
+    else if  (pid > 0 && isBackground){
       SmallShell &shell = SmallShell::getInstance();
-      cout <<cmd->gedCmdLine();
       shell.getJobs()->addJob(cmd, getpid());
+    }
+    else if (pid == 0 && isBackground) {
+      setpgrp();
+      //Add to jobs list!!!!
       return cmd;
     }
   }
@@ -256,7 +257,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
   cout<<cmd->gedCmdLine()<<endl;
     int id = max_id +1;
-    cout<< "      "<< cmd->gedCmdLine()<<" hiii";
+    cout<<cmd->gedCmdLine()<<;
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
  }
