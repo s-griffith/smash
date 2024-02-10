@@ -191,6 +191,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
 
       ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
       SmallShell &shell = SmallShell::getInstance();
+      cout <<cmd->gedCmdLine;
       shell.getJobs()->addJob(cmd, getpid());
       return cmd;
     }
