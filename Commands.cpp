@@ -170,15 +170,13 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     //Can a complex command be run in the background?
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
-    pid_t pid = fork();
     char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
-      strcpy(fixed_cmd, cmd_line);
-      _removeBackgroundSign(fixed_cmd);
+    strcpy(fixed_cmd, cmd_line);
+    removeBackgroundSign(fixed_cmd);
 
-      ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
-      if(pid){
-        wait(&stat);
-      }
+    ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
+    pid_t pid = fork();
+    
       cout<<"182";
     if (pid < 0) {
       perror("smash error: fork failed");
