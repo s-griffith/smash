@@ -189,7 +189,10 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       strcpy(fixed_cmd, cmd_line);
       _removeBackgroundSign(fixed_cmd);
       cout<<"193";
-      return new ExternalCommand(fixed_cmd);
+      ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
+      SmallShell &shell = SmallShell::getInstance();
+      shell.getJobs.addJob(cmd, getpid());
+      return cmd;
     }
   }
   return nullptr;
