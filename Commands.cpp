@@ -177,7 +177,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
     pid_t pid = fork();
     
-      cout<<"182";
+      cout<<"182"<<isBackground;
     if (pid < 0) {
       perror("smash error: fork failed");
     }
