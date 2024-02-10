@@ -179,6 +179,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       if(pid){
         wait(&stat);
       }
+      cout<<"182";
     if (pid < 0) {
       perror("smash error: fork failed");
     }
