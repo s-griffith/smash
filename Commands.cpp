@@ -191,7 +191,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       cout<<"193";
       ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
       SmallShell &shell = SmallShell::getInstance();
-      shell.getJobs.addJob(cmd, getpid());
+      shell.getJobs().addJob(cmd, getpid());
       return cmd;
     }
   }
