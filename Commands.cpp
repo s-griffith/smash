@@ -255,15 +255,10 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
   cout<<cmd->gedCmdLine()<<endl;
-  //removeFinishedJobs();
-  cout<< "  258  ";
-  if(!isStopped)
-  {
     int id = max_id +1;
     cout<< "      "<< cmd->gedCmdLine()<<" hiii";
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
-  }
  }
 void JobsList::printJobsList(){
   cout<<m_list.size()<<"266";
