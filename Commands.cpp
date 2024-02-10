@@ -80,13 +80,10 @@ void _removeBackgroundSign(char* cmd_line) {
 
 //-------------------------------------Helper Functions-------------------------------------
 
-bool isBackGround(const char* str) {
-    size_t len = strlen(str);
-    return str[len - 1] == '&';
-}
+
 
 char** getArgs(const char* cmd_line, int* numArgs) {
-  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**));
+  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**) + 1);
   //initialize to nullptr?
   if (!args) {
    perror("smash error: malloc failed"); 
@@ -97,7 +94,7 @@ char** getArgs(const char* cmd_line, int* numArgs) {
 
 void firstUpdateCurrDir() {
   SmallShell& smash = SmallShell::getInstance();
-    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char));
+    char* buffer = (char*)malloc(MAX_PATH_LEGNTH * sizeof(char)+1);
     if (!buffer) {
       free(buffer);
       perror("smash error: malloc failed"); 
@@ -331,6 +328,7 @@ void ChangePromptCommand::execute() {
   else {
     smash.chngPrompt(string(args[1]));
   }
+  free(args);
 }
 
 //-------------------------------------ShowPidCommand-------------------------------------
