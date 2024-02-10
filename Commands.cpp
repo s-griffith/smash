@@ -258,6 +258,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
   if(!isStopped)
   {
     int id = max_id +1;
+    cout<< "      "<< cmd->gedCmdLine();
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
   }
