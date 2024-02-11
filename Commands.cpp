@@ -184,7 +184,6 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {
- cout<<"187";
     //Can a complex command be run in the background?
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
@@ -192,11 +191,13 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     strcpy(fixed_cmd, cmd_line);
     _removeBackgroundSign(fixed_cmd);
     ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
+    SmallShell &shell = SmallShell::getInstance();
     pid_t pid = fork();
     if (pid < 0) {
       perror("smash error: fork failed");
     }
     if (pid > 0 && !isBackground) {
+      smash.m_pid_fg = pid;
       while ((pid = wait(&stat)) > 0);//if a background son will finish? maybe waitpid
       return nullptr;
     }
@@ -205,7 +206,6 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       return cmd;
     }
     else if  (pid > 0 && isBackground){
-      SmallShell &shell = SmallShell::getInstance();
       shell.getJobs()->addJob(cmd, pid);
     }
     else if (pid == 0 && isBackground) {
