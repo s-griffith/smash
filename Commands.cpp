@@ -330,6 +330,10 @@ void JobsList::removeFinishedJobs() {
         max_id = max;
     }
 
+    bool JobsList::isEmpty(){
+      return !m_list.size();
+    }
+
  int JobsList::getMaxId(){
    return max_id;
  }
@@ -389,6 +393,8 @@ void JobsList::removeFinishedJobs() {
             //free_args(args, num_of_args);
             return;
         }
+       
+       if(smash.getJobs().size())
         JobsList::JobEntry *job = smash.getJobs()->getJobById(job_id);
         if(!job){
           cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;

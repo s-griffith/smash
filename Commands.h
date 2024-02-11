@@ -123,6 +123,7 @@ class JobsList {
   void removeJobById(int jobId);
   JobEntry * getLastJob(int* lastJobId);
   JobEntry *getLastStoppedJob(int *jobId);
+  bool isEmpty();
   int getMaxId();
   // TODO: Add extra methods or modify exisitng ones as needed
 };
