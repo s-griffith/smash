@@ -169,7 +169,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
   else if (firstWord.compare("quit") == 0) {
-    cout<<jobs.printJobsList();
+   jobs.printJobsList();
    //return new QuitCommand(cmd_line, &jobs);
   }
 //others
