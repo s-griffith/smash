@@ -415,7 +415,7 @@ void JobsList::removeFinishedJobs() {
          
       int status;
       cout << job->m_cmd << " : " << job_pid <<"&" << endl;
-      smash.m_pid_fg = job_id;
+      smash.m_pid_fg = job_pid;
       smash.getJobs()->removeJobById(job_id);
       if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL) {
           perror("smash error: waitpid failed");
