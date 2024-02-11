@@ -270,6 +270,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
+    max_id++;
  }
 void JobsList::printJobsList(){
   removeFinishedJobs();
@@ -388,7 +389,7 @@ void JobsList::removeFinishedJobs() {
             return;
         }
          SmallShell &shell = SmallShell::getInstance();
-         shell.getJobs()->sigJobById(signum, job_id);
+         shell.getJobs()->sigJobById(job_id, signum);
   }
   }
 
