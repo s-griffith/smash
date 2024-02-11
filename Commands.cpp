@@ -147,7 +147,9 @@ SmallShell::~SmallShell() {
 Command * SmallShell::CreateCommand(const char* cmd_line) {
 	// For example:
   string cmd_s = _trim(string(cmd_line));
+  cout<<"150";
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
+  cout<<"151";
 
   if (firstWord.compare("pwd") == 0) {
     return new GetCurrDirCommand(cmd_line);
