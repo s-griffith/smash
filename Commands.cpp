@@ -164,6 +164,9 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   else if (firstWord.compare("jobs") == 0) {
     return new JobsCommand(cmd_line);
   }
+  else if (firstWord.compare("quit") == 0) {
+    return new QuitCommand(cmd_line, jobs);
+  }
 //others
   else {
 
@@ -264,6 +267,7 @@ void JobsList::printJobsList(){
   for (JobEntry element : m_list) {
      // element.job.second
         std::cout << "["<< i << "] "<< element.m_cmd << "&"<< endl;
+        ///TODO: remove the last space!!!
         i++;
     }
 }
@@ -293,7 +297,25 @@ void JobsList::removeFinishedJobs() {
     smash.getJobs()->printJobsList();
   
  }
+  void JobsCommand::killAllJobs(){
+    cout<<"smash: sending SIGKILL signal to " << m_list.size()<< " jobs:"
+    removeFinishedJobs();
+    for (JobEntry element : m_list) {
+      cout<<element.m_pid<< ": "<<element.m_cmd << "&"<<endl;//remove space
+      int result = kill(element.m_pid, SIGKILL);
+    }
+  }
   //JobsList(){}
+
+  //-------------------------------------Quit-------------------------------------
+  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):cmd_line(cmd_line), (jobs){}
+ void  QuitCommand::execute(){
+  int numArgs=0;
+  char ** args = getArgs(cmd_line, numArgs);
+    if(args[numArgs-1] == "kill"){
+      deleteJobs()
+    }
+ }
 
 
 //-------------------------------------Command-------------------------------------
