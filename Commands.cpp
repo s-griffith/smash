@@ -165,9 +165,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new ChangeDirCommand(cmd_line_clean, &m_prevDir);
   }
 //others
-  else {
-    //Can a complex command be run in the background?
-    
+  else {    
     int stat = 0;
     pid_t pid = fork();
     if (pid < 0) {
@@ -222,6 +220,10 @@ void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   }
   int length = string(currDir).length() + string(toCombine).length() + 1;
   char* temp = (char*)malloc(length * sizeof(char));
+  if (temp == nullptr) {
+    free(temp);
+    perror("smash error: malloc failed");
+  }
   strcpy(temp, currDir);
   strcat(temp, "/");
   strcat(temp, toCombine);
@@ -359,7 +361,9 @@ void ExternalCommand::execute() {
     int numArgs = 0;
     char** args = getArgs(this->m_cmd_line, &numArgs);
     string command = string(args[0]);
-    execvp(command.c_str(), args);
+    if (execvp(command.c_str(), args) == -1) {
+      perror("smash error: evecvp failed");
+    }
     free(args);
   }
 }
