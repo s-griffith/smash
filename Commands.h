@@ -134,6 +134,7 @@ class JobsCommand : public BuiltInCommand {
 };
 
 class KillCommand : public BuiltInCommand {
+  JobsList* m_jobs;
  // TODO: Add your data members
  public:
   KillCommand(const char* cmd_line, JobsList* jobs);

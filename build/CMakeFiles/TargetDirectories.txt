@@ -1,0 +1,3 @@
+C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/build/CMakeFiles/skeleton_smash.dir
+C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/build/CMakeFiles/edit_cache.dir
+C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/build/CMakeFiles/rebuild_cache.dir

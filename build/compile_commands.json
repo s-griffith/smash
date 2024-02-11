@@ -1,0 +1,17 @@
+[
+{
+  "directory": "C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/build",
+  "command": "C:\\MinGW\\bin\\g++.exe   -g -std=gnu++14 -o CMakeFiles\\skeleton_smash.dir\\smash.cpp.obj -c \"C:\\Users\\shlom\\OneDrive - Technion\\Technion\\OS\\smash\\smash.cpp\"",
+  "file": "C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/smash.cpp"
+},
+{
+  "directory": "C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/build",
+  "command": "C:\\MinGW\\bin\\g++.exe   -g -std=gnu++14 -o CMakeFiles\\skeleton_smash.dir\\Commands.cpp.obj -c \"C:\\Users\\shlom\\OneDrive - Technion\\Technion\\OS\\smash\\Commands.cpp\"",
+  "file": "C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/Commands.cpp"
+},
+{
+  "directory": "C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/build",
+  "command": "C:\\MinGW\\bin\\g++.exe   -g -std=gnu++14 -o CMakeFiles\\skeleton_smash.dir\\signals.cpp.obj -c \"C:\\Users\\shlom\\OneDrive - Technion\\Technion\\OS\\smash\\signals.cpp\"",
+  "file": "C:/Users/shlom/OneDrive - Technion/Technion/OS/smash/signals.cpp"
+}
+]

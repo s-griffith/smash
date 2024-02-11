@@ -258,39 +258,49 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  
  
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
-  cout<<cmd->gedCmdLine()<<endl;
-    int id = max_id +1;
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
  }
 void JobsList::printJobsList(){
   removeFinishedJobs();
   int i=1;
-  for (JobEntry element : m_list) {
+  for (JobEntry job : m_list) {
      // element.job.second
-        std::cout << "["<< i << "] "<< element.m_cmd << "&"<< endl;
+        std::cout << "["<< i << "] "<< job.m_cmd << "&"<< endl;
         ///TODO: remove the last space!!!
         i++;
     }
 }
 
+JobEntry * JobsList::getJobById(int jobId){
+  for(JobEntry job : job_list){
+        if (job.job_id == jobId) {
+            return &job;
+        }
+    }
+    return nullptr;
+}
+
 void JobsList::removeFinishedJobs() {
     if (m_list.empty()) {
-        max_id = 1;
+        max_id = 0;
         return;
     }
-
+    int max=0;
     SmallShell &shell = SmallShell::getInstance();
     for (auto it = m_list.begin(); it != m_list.end(); ++it) {
       auto job = *it;
       int status;
       int ret_wait = waitpid(job.m_pid, &status, WNOHANG);
       if (ret_wait == job.m_pid || ret_wait == -1) {
-        cout<<"284";
         m_list.erase(it);
         --it;
          }
+         else if(job.m_id>max){
+          max= job.m_id;
+         }
         }
+        max_id = max;
     }
 
  JobsCommand::JobsCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
@@ -304,9 +314,22 @@ void JobsList::removeFinishedJobs() {
     removeFinishedJobs();
     for (JobEntry element : m_list) {
       cout<<element.m_pid<< ": "<<element.m_cmd << "&"<<endl;//remove space
-      int result = kill(element.m_pid, SIGKILL);
+      kill(element.m_pid, SIGKILL);
     }
   }
+
+   void JobsList::sigJobById(int jobId, int signum){
+    JobEntry *job = getJobById(job_id);
+    if(!job){
+      cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
+      return;
+    }
+    if (kill(job->m_pid, signum) == SYS_FAIL) {
+                perror("smash error: kill failed");
+                return;
+            }
+             cout << "signal number " << signum << " was sent to pid " << job->m_pid << endl;
+   }
   //JobsList(){}
 
   //-------------------------------------Quit-------------------------------------
@@ -321,6 +344,42 @@ void JobsList::removeFinishedJobs() {
     }
     exit(0);
  }
+
+  //-------------------------------------Kill-------------------------------------
+  KillCommand::KillCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
+  void KillCommand::execute(){
+    int num_of_args;
+    char **args = getArgs(this->cmd_line, &num_of_args);
+    
+    if (num_of_args != 3) {
+        cerr << "smash error: kill: invalid arguments" << endl;
+    } else {
+
+        int signum;
+        int job_id;
+        try {
+            // Check for a valid job-id
+            if (!is_number(args[2]))
+                throw exception();
+            char first_char = string(args[1]).at(0);
+            char minus = '-';
+            if (first_char != minus)
+                throw exception();
+            job_id = stoi(args[2]);
+
+            // Check for a valid signal number
+
+            if (!is_number(string(args[1]).erase(0, 1)))
+                throw exception();
+            signum = stoi(string(args[1]).erase(0, 1));
+        } catch (exception &) {
+            cerr << "smash error: kill: invalid arguments" << endl;
+            free_args(args, num_of_args);
+            return;
+        }
+         SmallShell &shell = SmallShell::getInstance();
+         shell.getJobs().sigJobById(signum, job_id);
+  }
 
 
 //-------------------------------------Command-------------------------------------
