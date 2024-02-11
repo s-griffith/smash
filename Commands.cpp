@@ -352,12 +352,12 @@ void JobsList::removeFinishedJobs() {
   //JobsList(){}
 
   //-------------------------------------ForeGround-------------------------------------
-    ForeGroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line){}
-    void ForeGroundCommand::execute(){
+    ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line){}
+    void ForegroundCommand::execute(){
        int numArgs;
-       char **args = init_args(this->cmd_line, &numArgs);
+       char **args = getArgs(this->cmd_line, &numArgs);
        if(numArgs > 2){
-        cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
+         cerr << "smash error: fg: invalid arguments" << endl;
         return;
        }
 
@@ -376,13 +376,17 @@ void JobsList::removeFinishedJobs() {
             //free_args(args, num_of_args);
             return;
         }
-        JobsList::JobEntry *job = smash.getJobs().getJobById(job_id);
+        JobsList::JobEntry *job = smash.getJobs()->getJobById(job_id);
+        if(!job){
+          cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
+          return;
+        }
         if (job_id >= 0 && job) {
-            int job_pid = job->job_pid;
-            if (job->isStopped) {
+            int job_pid = job->m_pid;
+            if (job->m_isStopped) {
                 if (kill(job_pid, SIGCONT) == SYS_FAIL) {
                     perror("smash error: kill failed");
-                    free_args(args, num_of_args);
+                    //free_args(args, num_of_args);
                     ///TODO: check free
                     return;
                 }
