@@ -300,9 +300,8 @@ void JobsList::removeFinishedJobs() {
   
  }
   void JobsList::killAllJobs(){
-    cout<<"smash: sending SIGKILL signal to " << m_list.size()<< " jobs:";
+    cout<<"smash: sending SIGKILL signal to " << m_list.size()<< " jobs:"<<endl;
     removeFinishedJobs();
-    cout<<"303";
     for (JobEntry element : m_list) {
       cout<<element.m_pid<< ": "<<element.m_cmd << "&"<<endl;//remove space
       int result = kill(element.m_pid, SIGKILL);
@@ -320,6 +319,7 @@ void JobsList::removeFinishedJobs() {
        SmallShell& smash = SmallShell::getInstance();
        smash.getJobs()->killAllJobs();
     }
+    exit(0);
  }
 
 
