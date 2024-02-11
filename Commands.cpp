@@ -81,10 +81,12 @@ void _removeBackgroundSign(char* cmd_line) {
 //-------------------------------------Helper Functions-------------------------------------
 
 char** getArgs(const char* cmd_line, int* numArgs) {
-  char** args = (char**)malloc(COMMAND_MAX_ARGS * sizeof(char**) + 1);
-  //initialize to nullptr?
-  if (!args) {
-   perror("smash error: malloc failed"); 
+  cout << "get args: " << string(cmd_line) << endl;
+  char** args = (char**)malloc(COMMAND_ARGS_MAX_LENGTH * sizeof(char*) + 1);
+  if (args == nullptr) {
+   perror("smash error: malloc failed");
+   free(args);
+   return nullptr; 
   }
   *numArgs = _parseCommandLine(cmd_line, args);
   return args;
@@ -92,17 +94,17 @@ char** getArgs(const char* cmd_line, int* numArgs) {
 
 void firstUpdateCurrDir() {
   SmallShell& smash = SmallShell::getInstance();
-    char* buffer = (char*)malloc(MAX_PATH_LENGTH * sizeof(char) + 1);
-    if (!buffer) {
-      free(buffer);
-      perror("smash error: malloc failed"); 
-    }
-    buffer = getcwd(buffer, MAX_PATH_LENGTH);
-    if (!buffer) {
-      free(buffer);
-      perror("smash error: getcwd failed"); 
-    }
-    smash.setCurrDir(buffer);
+  char* buffer = (char*)malloc(MAX_PATH_LENGTH * sizeof(char) + 1);
+  if (!buffer) {
+    free(buffer);
+    perror("smash error: malloc failed"); 
+  }
+  buffer = getcwd(buffer, MAX_PATH_LENGTH);
+  if (!buffer) {
+    free(buffer);
+    perror("smash error: getcwd failed"); 
+  }
+  smash.setCurrDir(buffer);
 }
 
 bool checkFullPath(char* currPath, char* newPath) {
@@ -143,8 +145,11 @@ SmallShell::~SmallShell() {
 * Creates and returns a pointer to Command class which matches the given command line (cmd_line)
 */
 Command * SmallShell::CreateCommand(const char* cmd_line) {
+  if (cmd_line == nullptr) {
+    return nullptr;
+  }
   bool isBackground = _isBackgroundComamnd(cmd_line);
-  char cmd[COMMAND_MAX_ARGS + 1];
+  char cmd[COMMAND_ARGS_MAX_LENGTH];
   strcpy(cmd, cmd_line);
   if (isBackground) {
     _removeBackgroundSign(cmd);
@@ -170,6 +175,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     pid_t pid = fork();
     if (pid < 0) {
       perror("smash error: fork failed");
+      return nullptr;
     }
     if (pid > 0 && !isBackground) {
       while ((pid = wait(&stat)) > 0);
@@ -192,7 +198,7 @@ void SmallShell::executeCommand(const char *cmd_line) {
   // TODO: Add your implementation here
   // for example:
   Command* cmd = CreateCommand(cmd_line);
-  if (!cmd) {
+  if (cmd == nullptr) {
     return;
   }
   cmd->execute();
@@ -222,7 +228,8 @@ void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   char* temp = (char*)malloc(length * sizeof(char));
   if (temp == nullptr) {
     free(temp);
-    perror("smash error: malloc failed");
+    cerr << "smash error: malloc failed" << endl;
+    return;
   }
   strcpy(temp, currDir);
   strcat(temp, "/");
@@ -298,20 +305,33 @@ ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : Buil
 ///TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute() {
   SmallShell& smash = SmallShell::getInstance();
+  cout << "in execute: " << string(this->m_cmd_line) << endl;
   if(smash.getCurrDir() == nullptr) {
+    cout << "in if: " << string(this->m_cmd_line) << endl;
     firstUpdateCurrDir();
+    cout << "after if: " << string(this->m_cmd_line) << endl;
   }
+  cout << "outside if: " << string(this->m_cmd_line) << endl;
   int numArgs = 0;
+  cout << "in execute before send: " << string(this->m_cmd_line) << endl;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  if (numArgs > 2) {
-    perror("smash error: cd: too many arguments");
+  cout << "num args = " << numArgs << endl;
+
+  if (numArgs >= 2) { //the command itself does not count as an arg
+    cerr << "smash error: cd: too many arguments" << endl;
+    free(args);
+    return;
   }
   else if (*m_plastPwd == nullptr && string(args[1]) == "-") {
-    perror("smash error: cd: OLDPWD not set");
+    cerr << "smash error: cd: OLDPWD not set" << endl;
+    free(args);
+    return;
   }
   else if (string(args[1]) == "-") {
     if (chdir(*m_plastPwd) != 0) {
       perror("smash error: chdir failed");
+      free(args);
+      return;
     }
     //switch current and previous directories
     char* temp = smash.getCurrDir();
@@ -321,6 +341,8 @@ void ChangeDirCommand::execute() {
   }
   if (chdir(args[1]) != 0) {
     perror("smash error: chdir failed");
+    free(args);
+    return;
   }
   //If the given "path" is to go up, remove the last part of the current path
   if (string(args[1]) == "..") {
@@ -348,13 +370,14 @@ ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 void ExternalCommand::execute() {
   bool isComplex = string(this->m_cmd_line).find("*") != string::npos || string(this->m_cmd_line).find("?")!= string::npos;
   if (isComplex) {
-    char cmd_trimmed[COMMAND_MAX_ARGS + 1];
+    char cmd_trimmed[COMMAND_ARGS_MAX_LENGTH];
     strcpy(cmd_trimmed, _trim(string(this->m_cmd_line)).c_str());
     char c[] = "-c";
     char path[] = "/bin/bash";
     char* complexArgs[] = {path, c, cmd_trimmed, nullptr};
     if (execv(path, complexArgs) == -1) {
       perror("smash error: execv failed");
+      return;
     }
   }
   else {
@@ -363,6 +386,8 @@ void ExternalCommand::execute() {
     string command = string(args[0]);
     if (execvp(command.c_str(), args) == -1) {
       perror("smash error: evecvp failed");
+      free(args);
+      return;
     }
     free(args);
   }
