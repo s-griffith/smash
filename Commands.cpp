@@ -383,7 +383,6 @@ void JobsList::removeFinishedJobs() {
      cerr<< "smash error: fg: jobs list is empty"<<endl;
      return ;
     }
-      SmallShell& smash = SmallShell::getInstance();
      int job_id;
      if(numArgs == 1){
        job_id = smash.getJobs()->getMaxId();
