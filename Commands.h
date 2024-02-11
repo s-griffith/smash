@@ -123,6 +123,7 @@ class JobsList {
   void removeJobById(int jobId);
   JobEntry * getLastJob(int* lastJobId);
   JobEntry *getLastStoppedJob(int *jobId);
+  int getMaxId();
   // TODO: Add extra methods or modify exisitng ones as needed
 };
 
@@ -165,14 +166,23 @@ class SmallShell {
   char* m_prevDir;
   ///TODO: MIGHT MAKE PROBLEMS LATER ON. IF DOES, GET RID OF FLAG AND RUN SYSCALL EVERY TIME FOR PWD
   char* m_currDirectory;
+  
   SmallShell(const std::string prompt = "smash");
+  
   JobsList jobs;
-  //std::vector<std::pair<int, std::string>> JobsList;
+ 
  public:
+  
   static pid_t m_pid;
+
+  int m_pid_fg = 0;
+ 
   Command *CreateCommand(const char* cmd_line);
+  
   SmallShell(SmallShell const&)      = delete; // disable copy ctor
+ 
   void operator=(SmallShell const&)  = delete; // disable = operator
+ 
   static SmallShell& getInstance() // make SmallShell singleton
   {
     static SmallShell instance; // Guaranteed to be destroyed.

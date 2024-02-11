@@ -176,6 +176,9 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   else if (firstWord.compare("quit") == 0) {
    return new QuitCommand(cmd_line, &jobs);
   }
+  else if (firstWord.compare("fg") == 0) {
+   return new ForegroundCommand(cmd_line, &jobs);
+  }
    else if (firstWord.compare("kill") == 0) {
    return new KillCommand(cmd_line, &jobs);
   }
@@ -286,7 +289,6 @@ void JobsList::printJobsList(){
 JobsList::JobEntry * JobsList::getJobById(int jobId){
   for(auto& job : m_list){
         if (job.m_id == jobId) {
-          cout<<"id    "<<job.m_id;
             return &job;
         }
     }
@@ -314,6 +316,11 @@ void JobsList::removeFinishedJobs() {
         }
         max_id = max;
     }
+
+ int JobsList::getMaxId(){
+   return max_id;
+ }
+
 
  JobsCommand::JobsCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
  void JobsCommand::execute(){
@@ -343,6 +350,61 @@ void JobsList::removeFinishedJobs() {
              cout << "signal number " << signum << " was sent to pid " << job->m_pid << endl;
    }
   //JobsList(){}
+
+  //-------------------------------------ForeGround-------------------------------------
+    ForeGroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line){}
+    void ForeGroundCommand::execute(){
+       int numArgs;
+       char **args = init_args(this->cmd_line, &numArgs);
+       if(numArgs > 2){
+        cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
+        return;
+       }
+
+
+        SmallShell& smash = SmallShell::getInstance();
+        int job_id;
+        if(numArgs == 1){
+          job_id = smash.getJobs()->getMaxId();
+        }
+        else try {
+            if (!is_number(args[1]))
+                throw exception();
+            job_id = stoi(args[1]);
+        } catch (exception &) {
+            cerr << "smash error: fg: invalid arguments" << endl;
+            //free_args(args, num_of_args);
+            return;
+        }
+        JobsList::JobEntry *job = smash.getJobs().getJobById(job_id);
+        if (job_id >= 0 && job) {
+            int job_pid = job->job_pid;
+            if (job->isStopped) {
+                if (kill(job_pid, SIGCONT) == SYS_FAIL) {
+                    perror("smash error: kill failed");
+                    free_args(args, num_of_args);
+                    ///TODO: check free
+                    return;
+                }
+            }
+            
+            int status;
+            cout << job->m_cmd << " : " << job_pid << endl;
+            smash.m_pid_fg = job_id;
+            smash.job_list.removeJobById(job_id);
+            if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL) {
+                perror("smash error: waitpid failed");
+                free_args(args, num_of_args);
+                return;
+            }
+
+
+
+    }
+    }
+
+
+
 
   //-------------------------------------Quit-------------------------------------
   QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
