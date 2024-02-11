@@ -149,7 +149,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   string cmd_s = _trim(string(cmd_line));
   cout<<"150";
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
-  cout<<"151";
+  cout<<firstWord;
 
   if (firstWord.compare("pwd") == 0) {
     return new GetCurrDirCommand(cmd_line);
@@ -166,7 +166,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   else if (firstWord.compare("jobs") == 0) {
     return new JobsCommand(cmd_line);
   }
-  else if (firstWord.compare("quit") == 0) {
+  else if (firstWord.compare("quit1") == 0) {
     cout<<"168";
     return new QuitCommand(cmd_line, &jobs);
   }
