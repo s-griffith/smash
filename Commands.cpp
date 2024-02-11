@@ -131,6 +131,12 @@ char* goUp(char* dir) {
   return dir;
 }
 
+bool is_number(const std::string &s) {
+    std::string::const_iterator it = s.begin();
+    //if(*it == '-') ++it; //negative number
+    while (it != s.end() && (std::isdigit(*it) || *it == '-')) ++it;
+    return !s.empty() && it == s.end();
+}
 //-------------------------------------SmallShell-------------------------------------
 
 pid_t SmallShell::m_pid = getppid();
@@ -322,7 +328,7 @@ void JobsList::removeFinishedJobs() {
    void JobsList::sigJobById(int jobId, int signum){
     JobEntry *job = getJobById(jobId);
     if(!job){
-      cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
+      cerr << "smash error: kill: job-id " << jobId << " does not exist" << endl;
       return;
     }
     if (kill(job->m_pid, signum) == SYS_FAIL) {
@@ -347,7 +353,7 @@ void JobsList::removeFinishedJobs() {
  }
 
   //-------------------------------------Kill-------------------------------------
-  KillCommand::KillCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
+  KillCommand::KillCommand(const char* cmd_line, JobsList* jobs): BuiltInCommand(cmd_line), m_jobs(jobs){}
   void KillCommand::execute(){
     int num_of_args;
     char **args = getArgs(this->m_cmd_line, &num_of_args);
