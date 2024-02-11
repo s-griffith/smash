@@ -109,7 +109,7 @@ class JobsList {
   };
   private:
   std::vector<JobEntry> m_list;
-  int max_id = -1;
+  int max_id = 0;
  // TODO: Add your data members
  public:
   JobsList() = default;
@@ -119,6 +119,7 @@ class JobsList {
   void killAllJobs();
   void removeFinishedJobs();
   JobEntry * getJobById(int jobId);
+  void sigJobById(int jobId, int signum);
   void removeJobById(int jobId);
   JobEntry * getLastJob(int* lastJobId);
   JobEntry *getLastStoppedJob(int *jobId);
