@@ -387,6 +387,7 @@ void JobsList::removeFinishedJobs() {
          SmallShell &shell = SmallShell::getInstance();
          shell.getJobs()->sigJobById(signum, job_id);
   }
+  }
 
 
 //-------------------------------------Command-------------------------------------
