@@ -308,10 +308,10 @@ void JobsList::removeFinishedJobs() {
   //JobsList(){}
 
   //-------------------------------------Quit-------------------------------------
-  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):cmd_line(cmd_line), m_jobs(jobs){}
+  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void  QuitCommand::execute(){
   int numArgs=0;
-  char ** args = getArgs(cmd_line, numArgs);
+  char ** args = getArgs(cmd_line, &numArgs);
     if(args[numArgs-1] == "kill"){
        SmallShell& smash = SmallShell::getInstance();
        smash.getJobs()->killAllJobs();
