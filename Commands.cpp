@@ -158,16 +158,16 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   string cmd_s = _trim(string(cmd_line_clean));
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
   if (firstWord.compare("pwd") == 0) {
-    return new GetCurrDirCommand(cmd_line_clean);
+    return new GetCurrDirCommand(cmd_line);
   }
   else if (firstWord.compare("showpid") == 0) {
-    return new ShowPidCommand(cmd_line_clean);
+    return new ShowPidCommand(cmd_line);
   }
   else if (firstWord.compare("chprompt") == 0) {
-    return new ChangePromptCommand(cmd_line_clean);
+    return new ChangePromptCommand(cmd_line);
   }
   else if (firstWord.compare("cd") == 0) {
-    return new ChangeDirCommand(cmd_line_clean, &m_prevDir);
+    return new ChangeDirCommand(cmd_line, &m_prevDir);
   }
 //others
   else {    
@@ -188,7 +188,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     else if (pid == 0 && isBackground) {
       setpgrp();
       //Add to jobs list!!!!
-      return new ExternalCommand(cmd_line_clean);
+      return new ExternalCommand(cmd_line);
     }
   }
   return nullptr;
@@ -305,18 +305,12 @@ ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : Buil
 ///TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute() {
   SmallShell& smash = SmallShell::getInstance();
-  cout << "in execute: " << string(this->m_cmd_line) << endl;
   if(smash.getCurrDir() == nullptr) {
-    cout << "in if: " << string(this->m_cmd_line) << endl;
     firstUpdateCurrDir();
-    cout << "after if: " << string(this->m_cmd_line) << endl;
   }
-  cout << "outside if: " << string(this->m_cmd_line) << endl;
   int numArgs = 0;
   cout << "in execute before send: " << string(this->m_cmd_line) << endl;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-  cout << "num args = " << numArgs << endl;
-
   if (numArgs >= 2) { //the command itself does not count as an arg
     cerr << "smash error: cd: too many arguments" << endl;
     free(args);
