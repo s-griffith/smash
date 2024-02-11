@@ -296,7 +296,7 @@ JobsList::JobEntry * JobsList::getJobById(int jobId){
     return nullptr;
 }
 
-  void removeJobById(int jobId){
+  void JobsList::removeJobById(int jobId){
     for (auto it = m_list.begin(); it != m_list.end(); ++it) {
       auto job = *it;
       if (jobId == job.m_pid) {
