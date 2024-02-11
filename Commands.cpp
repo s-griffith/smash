@@ -377,7 +377,7 @@ void JobsList::removeFinishedJobs() {
       cerr << "smash error: fg: invalid arguments" << endl;
      return;
     }
-    
+     SmallShell& smash = SmallShell::getInstance();
      if(smash.getJobs()->isEmpty() && numArgs == 1)
     {
      cerr<< "smash error: fg: jobs list is empty"<<endl;
