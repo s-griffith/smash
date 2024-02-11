@@ -20,6 +20,7 @@ const std::string WHITESPACE = " \n\r\t\f\v";
 #else
 #define FUNC_ENTRY()
 #define FUNC_EXIT()
+#define SYS_FAIL -1
 #endif
 
 string _ltrim(const std::string& s)
@@ -319,7 +320,7 @@ void JobsList::removeFinishedJobs() {
   }
 
    void JobsList::sigJobById(int jobId, int signum){
-    JobEntry *job = getJobById(job_id);
+    JobEntry *job = getJobById(jobId);
     if(!job){
       cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
       return;
@@ -349,7 +350,7 @@ void JobsList::removeFinishedJobs() {
   KillCommand::KillCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
   void KillCommand::execute(){
     int num_of_args;
-    char **args = getArgs(this->cmd_line, &num_of_args);
+    char **args = getArgs(this->m_cmd_line, &num_of_args);
     
     if (num_of_args != 3) {
         cerr << "smash error: kill: invalid arguments" << endl;
@@ -374,11 +375,11 @@ void JobsList::removeFinishedJobs() {
             signum = stoi(string(args[1]).erase(0, 1));
         } catch (exception &) {
             cerr << "smash error: kill: invalid arguments" << endl;
-            free_args(args, num_of_args);
+            //free_args(args, num_of_args);
             return;
         }
          SmallShell &shell = SmallShell::getInstance();
-         shell.getJobs().sigJobById(signum, job_id);
+         shell.getJobs()->sigJobById(signum, job_id);
   }
 
 
