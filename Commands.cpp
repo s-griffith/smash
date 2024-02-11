@@ -136,7 +136,9 @@ pid_t SmallShell::m_pid = getppid();
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt) {
   m_prevDir = (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
-  m_currDirectory (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
+  strcpy(m_prevDir, "");
+  m_currDirectory = (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
+  strcpy(m_currDirectory, "");
 }
 
 SmallShell::~SmallShell() {
@@ -239,6 +241,7 @@ void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   strcat(temp, "/");
   strcat(temp, toCombine);
   strcpy(m_currDirectory, temp);
+  cout << m_currDirectory << endl;
 }
 
 char* SmallShell::getPrevDir() const {
@@ -300,7 +303,7 @@ GetCurrDirCommand::GetCurrDirCommand(const char* cmd_line) : BuiltInCommand(cmd_
 
 void GetCurrDirCommand::execute() {
   SmallShell& smash = SmallShell::getInstance();
-  if(smash.getCurrDir() == nullptr) {
+  if(!strcmp(smash.getCurrDir(), "")) {
     firstUpdateCurrDir();
   }
   cout << string(smash.getCurrDir()) << endl;
@@ -319,7 +322,7 @@ void ChangeDirCommand::execute() {
   _removeBackgroundSign(cmd);
   const char* cmd_line_clean = cmd;
   
-  if(smash.getCurrDir() == nullptr) {
+  if(!strcmp(smash.getCurrDir(), "")) {
     firstUpdateCurrDir();
   }
   int numArgs = 0;
@@ -341,7 +344,9 @@ void ChangeDirCommand::execute() {
       return;
     }
     //switch current and previous directories
-    char* temp = smash.getCurrDir();
+    char temp[MAX_PATH_LENGTH + 1];
+    strcpy(temp, smash.getCurrDir());
+    //char* temp = smash.getCurrDir();
     smash.setCurrDir(smash.getPrevDir());
     smash.setPrevDir(temp);
     return;
