@@ -169,8 +169,8 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
   else if (firstWord.compare("quit") == 0) {
-    cout<<"168";
-    return new QuitCommand(cmd_line, &jobs);
+    cout<<&jobs;
+   //return new QuitCommand(cmd_line, &jobs);
   }
 //others
   else {
