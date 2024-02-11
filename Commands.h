@@ -85,6 +85,9 @@ public:
 class JobsList;
 class QuitCommand : public BuiltInCommand {
 // TODO: Add your data members public:
+public:
+  const char* cmd_line
+  JobsList* m_jobs;
   QuitCommand(const char* cmd_line, JobsList* jobs);
   virtual ~QuitCommand() {}
   void execute() override;
