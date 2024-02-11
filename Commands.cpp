@@ -134,7 +134,10 @@ char* goUp(char* dir) {
 
 pid_t SmallShell::m_pid = getppid();
 
-SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {}
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt) {
+  m_prevDir = (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
+  m_currDirectory (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
+}
 
 SmallShell::~SmallShell() {
   free(m_prevDir);
@@ -221,7 +224,7 @@ char* SmallShell::getCurrDir() const {
 }
 void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   if (toCombine == nullptr) {
-    m_currDirectory = currDir;
+    strcpy(m_currDirectory, currDir);
     return;
   }
   int length = string(currDir).length() + string(toCombine).length() + 1;
@@ -234,14 +237,14 @@ void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   strcpy(temp, currDir);
   strcat(temp, "/");
   strcat(temp, toCombine);
-  m_currDirectory = temp;
+  strcpy(m_currDirectory, temp);
 }
 
 char* SmallShell::getPrevDir() const {
   return m_prevDir;
 }
 void SmallShell::setPrevDir(char* prevDir){
-  m_prevDir = prevDir;
+  strcpy(m_prevDir, prevDir);
 }
 
 //-------------------------------------Command-------------------------------------
