@@ -9,6 +9,7 @@ using namespace std;
 
 void ctrlCHandler(int sig_num) {
    SmallShell& smash = SmallShell::getInstance();
+   cout<<"hi!!!!!";
    if(smash.m_pid_fg){
     if (kill(smash.getJobs()->getJobById(smash.m_pid_fg)->m_pid, sig_num) == SYS_FAIL) {
         perror("smash error: kill failed");
