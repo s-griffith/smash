@@ -349,7 +349,9 @@ void ExternalCommand::execute() {
     char c[] = "-c";
     char path[] = "/bin/bash";
     char* complexArgs[] = {path, c, cmd_trimmed, nullptr};
-    execv(path, complexArgs);
+    if (execv(path, complexArgs) == -1) {
+      perror("smash error: execv failed");
+    }
   }
   else {
     int numArgs = 0;
