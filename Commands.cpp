@@ -81,7 +81,6 @@ void _removeBackgroundSign(char* cmd_line) {
 //-------------------------------------Helper Functions-------------------------------------
 
 char** getArgs(const char* cmd_line, int* numArgs) {
-  cout << "get args: " << string(cmd_line) << endl;
   char** args = (char**)malloc(COMMAND_ARGS_MAX_LENGTH * sizeof(char*) + 1);
   if (args == nullptr) {
    perror("smash error: malloc failed");
@@ -130,6 +129,7 @@ char* goUp(char* dir) {
   return dir;
 }
 
+
 //-------------------------------------SmallShell-------------------------------------
 
 pid_t SmallShell::m_pid = getppid();
@@ -148,15 +148,15 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   if (cmd_line == nullptr) {
     return nullptr;
   }
-  bool isBackground = _isBackgroundComamnd(cmd_line);
+  //Removes background sign (if exists):
   char cmd[COMMAND_ARGS_MAX_LENGTH];
   strcpy(cmd, cmd_line);
-  if (isBackground) {
-    _removeBackgroundSign(cmd);
-  }
+  _removeBackgroundSign(cmd);
   const char* cmd_line_clean = cmd;
+  //Compare command without background sign:
   string cmd_s = _trim(string(cmd_line_clean));
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
+  //Find appropriate command:
   if (firstWord.compare("pwd") == 0) {
     return new GetCurrDirCommand(cmd_line);
   }
@@ -171,6 +171,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   }
 //others
   else {    
+    bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
     if (pid < 0) {
@@ -264,9 +265,13 @@ ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand:
 ChangePromptCommand::~ChangePromptCommand() {}
 
 void ChangePromptCommand::execute() {
-  ///TODO: NOT SUPPOSED TO CHANGE ERROR MESSAGES
+  //Remove background sign if exists:
+  char cmd[COMMAND_ARGS_MAX_LENGTH];
+  strcpy(cmd, this->m_cmd_line);
+  _removeBackgroundSign(cmd);
+  const char* cmd_line_clean = cmd;
   int numArgs = 0;
-  char** args = getArgs(this->m_cmd_line, &numArgs);
+  char** args = getArgs(cmd_line_clean, &numArgs);
   SmallShell& smash = SmallShell::getInstance();
   if (numArgs == 1) {
     smash.chngPrompt();
@@ -305,13 +310,18 @@ ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : Buil
 ///TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute() {
   SmallShell& smash = SmallShell::getInstance();
+  //Removes background sign (if exists):
+  char cmd[COMMAND_ARGS_MAX_LENGTH];
+  strcpy(cmd, this->m_cmd_line);
+  _removeBackgroundSign(cmd);
+  const char* cmd_line_clean = cmd;
+  
   if(smash.getCurrDir() == nullptr) {
     firstUpdateCurrDir();
   }
   int numArgs = 0;
-  cout << "in execute before send: " << string(this->m_cmd_line) << endl;
-  char** args = getArgs(this->m_cmd_line, &numArgs);
-  if (numArgs >= 2) { //the command itself does not count as an arg
+  char** args = getArgs(cmd_line_clean, &numArgs);
+  if (numArgs > 2) { //the command itself counts as an arg
     cerr << "smash error: cd: too many arguments" << endl;
     free(args);
     return;
