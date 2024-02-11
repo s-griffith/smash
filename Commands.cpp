@@ -300,6 +300,7 @@ void JobsList::removeFinishedJobs() {
   void JobsList::killAllJobs(){
     cout<<"smash: sending SIGKILL signal to " << m_list.size()<< " jobs:";
     removeFinishedJobs();
+    cout<<"303";
     for (JobEntry element : m_list) {
       cout<<element.m_pid<< ": "<<element.m_cmd << "&"<<endl;//remove space
       int result = kill(element.m_pid, SIGKILL);
@@ -311,6 +312,7 @@ void JobsList::removeFinishedJobs() {
   QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void  QuitCommand::execute(){
   int numArgs=0;
+      cout<<"315";
   char ** args = getArgs(cmd_line, &numArgs);
     if(args[numArgs-1] == "kill"){
        SmallShell& smash = SmallShell::getInstance();
