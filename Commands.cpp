@@ -398,7 +398,7 @@ void JobsList::removeFinishedJobs() {
             smash.getJobs()->removeJobById(job_id);
             if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL) {
                 perror("smash error: waitpid failed");
-                free_args(args, num_of_args);
+                //free_args(args, num_of_args);
                 return;
             }
 
