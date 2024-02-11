@@ -136,7 +136,6 @@ pid_t SmallShell::m_pid = getppid();
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {
    cout << "Constructor called..........\n";
-   jobs = new JobsCommand("jobs");
      }
 
 SmallShell::~SmallShell() {
