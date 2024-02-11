@@ -323,7 +323,7 @@ void JobsList::removeFinishedJobs() {
   args = getArgs(cmd_line, &numArgs);
     //if(args[numArgs-1] == "kill"){
        SmallShell& smash = SmallShell::getInstance();
-       smash.getJobs()->killAllJobs();
+       //smash.getJobs()->killAllJobs();
     //}
  }
 
