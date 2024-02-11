@@ -271,6 +271,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped)
  
  
  void JobsList::addJob(Command* cmd, pid_t pid, bool isStopped){
+  removeFinishedJobs(); //think on a better way to update maxId!!!!
     JobEntry newJob(max_id +1, pid, cmd->gedCmdLine(),isStopped);
     this->m_list.push_back(newJob);
     max_id++;
@@ -294,6 +295,18 @@ JobsList::JobEntry * JobsList::getJobById(int jobId){
     }
     return nullptr;
 }
+
+  void removeJobById(int jobId){
+    for (auto it = m_list.begin(); it != m_list.end(); ++it) {
+      auto job = *it;
+      if (jobId == job.m_pid) {
+        m_list.erase(it);
+        --it;
+        return;
+        }
+  }
+  }
+
 
 void JobsList::removeFinishedJobs() {
     if (m_list.empty()) {
