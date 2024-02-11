@@ -316,6 +316,7 @@ void JobsList::removeFinishedJobs() {
   int numArgs=0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
     if(args[numArgs-1] == "kill"){
+      cout<<"killing.....";
        SmallShell& smash = SmallShell::getInstance();
        smash.getJobs()->killAllJobs();
     }
