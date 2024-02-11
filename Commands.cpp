@@ -134,7 +134,10 @@ char* goUp(char* dir) {
 
 pid_t SmallShell::m_pid = getppid();
 
-SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) { cout << "Constructor called..........\n";  }
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {
+   cout << "Constructor called..........\n";
+   jobs = new JobsCommand("jobs");
+     }
 
 SmallShell::~SmallShell() {
   free(m_prevDir);
@@ -166,7 +169,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
   else if (firstWord.compare("jobs") == 0) {
     return new JobsCommand(cmd_line);
   }
-  else if (firstWord.compare("quit1") == 0) {
+  else if (firstWord.compare("quit") == 0) {
     cout<<"168";
     return new QuitCommand(cmd_line, &jobs);
   }
@@ -312,7 +315,7 @@ void JobsList::removeFinishedJobs() {
   //JobsList(){}
 
   //-------------------------------------Quit-------------------------------------
-  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){cout<<"313";}
+  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void  QuitCommand::execute(){
   int numArgs=0;
       cout<<"315";
