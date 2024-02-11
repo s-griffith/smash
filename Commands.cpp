@@ -149,9 +149,7 @@ SmallShell::~SmallShell() {
 Command * SmallShell::CreateCommand(const char* cmd_line) {
 	// For example:
   string cmd_s = _trim(string(cmd_line));
-  cout<<"150";
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
-  cout<<firstWord;
 
   if (firstWord.compare("pwd") == 0) {
     return new GetCurrDirCommand(cmd_line);
@@ -169,7 +167,6 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
   else if (firstWord.compare("quit") == 0) {
-   jobs.printJobsList();
    return new QuitCommand(cmd_line, &jobs);
   }
 //others
@@ -318,10 +315,10 @@ void JobsList::removeFinishedJobs() {
  void  QuitCommand::execute(){
   int numArgs=0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
-    //if(args[numArgs-1] == "kill"){
+    if(args[numArgs-1] == "kill"){
        SmallShell& smash = SmallShell::getInstance();
-       //smash.getJobs()->killAllJobs();
-    //}
+       smash.getJobs()->killAllJobs();
+    }
  }
 
 

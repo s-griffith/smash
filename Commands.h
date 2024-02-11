@@ -86,7 +86,7 @@ class JobsList;
 class QuitCommand : public BuiltInCommand {
 // TODO: Add your data members public:
 public:
-  const char* m_cmd_line;
+  //const char* m_cmd_line;
   JobsList* m_jobs;
   QuitCommand(const char* cmd_line, JobsList* jobs);
   virtual ~QuitCommand() {}
