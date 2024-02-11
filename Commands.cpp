@@ -284,7 +284,7 @@ void JobsList::printJobsList(){
 }
 
 JobsList::JobEntry * JobsList::getJobById(int jobId){
-  for(JobEntry job : m_list){
+  for(auto& job : m_list){
         if (job.m_id == jobId) {
           cout<<"id    "<<job.m_id;
             return &job;
