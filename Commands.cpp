@@ -143,26 +143,31 @@ SmallShell::~SmallShell() {
 * Creates and returns a pointer to Command class which matches the given command line (cmd_line)
 */
 Command * SmallShell::CreateCommand(const char* cmd_line) {
-	// For example:
-  string cmd_s = _trim(string(cmd_line));
+  bool isBackground = _isBackgroundComamnd(cmd_line);
+  char cmd[COMMAND_MAX_ARGS + 1];
+  strcpy(cmd, cmd_line);
+  if (isBackground) {
+    _removeBackgroundSign(cmd);
+  }
+  const char* cmd_line_clean = cmd;
+  string cmd_s = _trim(string(cmd_line_clean));
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
-
   if (firstWord.compare("pwd") == 0) {
-    return new GetCurrDirCommand(cmd_line);
+    return new GetCurrDirCommand(cmd_line_clean);
   }
   else if (firstWord.compare("showpid") == 0) {
-    return new ShowPidCommand(cmd_line);
+    return new ShowPidCommand(cmd_line_clean);
   }
   else if (firstWord.compare("chprompt") == 0) {
-    return new ChangePromptCommand(cmd_line);
+    return new ChangePromptCommand(cmd_line_clean);
   }
   else if (firstWord.compare("cd") == 0) {
-    return new ChangeDirCommand(cmd_line, &m_prevDir);
+    return new ChangeDirCommand(cmd_line_clean, &m_prevDir);
   }
 //others
   else {
     //Can a complex command be run in the background?
-    bool isBackground = _isBackgroundComamnd(cmd_line);
+    
     int stat = 0;
     pid_t pid = fork();
     if (pid < 0) {
@@ -179,10 +184,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     else if (pid == 0 && isBackground) {
       setpgrp();
       //Add to jobs list!!!!
-      char* fixed_cmd = (char*)malloc(MAX_PATH_LENGTH*sizeof(char)+1);
-      strcpy(fixed_cmd, cmd_line);
-      _removeBackgroundSign(fixed_cmd);
-      return new ExternalCommand(fixed_cmd);
+      return new ExternalCommand(cmd_line_clean);
     }
   }
   return nullptr;
