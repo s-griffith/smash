@@ -165,6 +165,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
   else if (firstWord.compare("quit") == 0) {
+    cout<<"168";
     return new QuitCommand(cmd_line, &jobs);
   }
 //others
@@ -309,7 +310,7 @@ void JobsList::removeFinishedJobs() {
   //JobsList(){}
 
   //-------------------------------------Quit-------------------------------------
-  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
+  QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){cout<<"313";}
  void  QuitCommand::execute(){
   int numArgs=0;
       cout<<"315";
