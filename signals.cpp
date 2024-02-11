@@ -15,6 +15,7 @@ void ctrlCHandler(int sig_num) {
         perror("smash error: kill failed");
         return;
      }
+     cout << "smash: process " << smash.m_pid_fg << " was killed" << endl;
    }
 }
 
