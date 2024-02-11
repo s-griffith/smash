@@ -342,15 +342,20 @@ void ChangeDirCommand::execute() {
 ExternalCommand::ExternalCommand(const char* cmd_line) : Command(cmd_line) {}
 
 void ExternalCommand::execute() {
-  int numArgs = 0;
-  char** args = getArgs(this->m_cmd_line, &numArgs);
   bool isComplex = string(this->m_cmd_line).find("*") != string::npos || string(this->m_cmd_line).find("?")!= string::npos;
   if (isComplex) {
-    execl("/bin/bash", "-c", "complex-external-command", args, (char*)NULL );
+    char cmd_trimmed[COMMAND_MAX_ARGS + 1];
+    strcpy(cmd_trimmed, _trim(string(this->m_cmd_line)).c_str());
+    char c[] = "-c";
+    char path[] = "/bin/bash";
+    char* complexArgs[] = {path, c, cmd_trimmed, nullptr};
+    execv(path, complexArgs);
   }
   else {
+    int numArgs = 0;
+    char** args = getArgs(this->m_cmd_line, &numArgs);
     string command = string(args[0]);
     execvp(command.c_str(), args);
+    free(args);
   }
-  free(args);
 }
