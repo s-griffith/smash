@@ -165,7 +165,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
     return new JobsCommand(cmd_line);
   }
   else if (firstWord.compare("quit") == 0) {
-    return new QuitCommand(cmd_line, jobs);
+    return new QuitCommand(cmd_line, &jobs);
   }
 //others
   else {
@@ -297,7 +297,7 @@ void JobsList::removeFinishedJobs() {
     smash.getJobs()->printJobsList();
   
  }
-  void JobsCommand::killAllJobs(){
+  void JobsList::killAllJobs(){
     cout<<"smash: sending SIGKILL signal to " << m_list.size()<< " jobs:"
     removeFinishedJobs();
     for (JobEntry element : m_list) {
@@ -313,7 +313,8 @@ void JobsList::removeFinishedJobs() {
   int numArgs=0;
   char ** args = getArgs(cmd_line, numArgs);
     if(args[numArgs-1] == "kill"){
-      deleteJobs()
+       SmallShell& smash = SmallShell::getInstance();
+       smash.getJobs()->killAllJobs();
     }
  }
 
