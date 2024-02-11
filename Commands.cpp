@@ -197,7 +197,7 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       perror("smash error: fork failed");
     }
     if (pid > 0 && !isBackground) {
-      smash.m_pid_fg = pid;
+      shell.m_pid_fg = pid;
       while ((pid = wait(&stat)) > 0);//if a background son will finish? maybe waitpid
       return nullptr;
     }
