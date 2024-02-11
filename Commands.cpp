@@ -355,7 +355,7 @@ void JobsList::removeFinishedJobs() {
     ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line){}
     void ForegroundCommand::execute(){
        int numArgs;
-       char **args = getArgs(this->cmd_line, &numArgs);
+       char **args = getArgs(this->m_cmd_line, &numArgs);
        if(numArgs > 2){
          cerr << "smash error: fg: invalid arguments" << endl;
         return;
@@ -395,7 +395,7 @@ void JobsList::removeFinishedJobs() {
             int status;
             cout << job->m_cmd << " : " << job_pid << endl;
             smash.m_pid_fg = job_id;
-            smash.job_list.removeJobById(job_id);
+            smash.getJobs()->removeJobById(job_id);
             if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL) {
                 perror("smash error: waitpid failed");
                 free_args(args, num_of_args);
