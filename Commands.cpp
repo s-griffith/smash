@@ -279,7 +279,7 @@ void JobsList::printJobsList(){
     }
 }
 
-JobEntry * JobsList::getJobById(int jobId){
+JobsList::JobEntry * JobsList::getJobById(int jobId){
   for(JobEntry job : job_list){
         if (job.job_id == jobId) {
             return &job;
