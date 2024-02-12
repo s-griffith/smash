@@ -50,7 +50,7 @@ int _parseCommandLine(const char *cmd_line, char **args)
   size_t indexA = string(cmd_line).find(">>");
   size_t indexW = string(cmd_line).find(">");
   if (indexA != string::npos) {
-    cmd = cmd.substr(0, indexA) + " >> " + cmd.substr(indexA+1, cmd.length()-indexA);
+    cmd = cmd.substr(0, indexA) + " >> " + cmd.substr(indexA+2, cmd.length()-indexA-1);
   }
   else if (indexW != string::npos) {
     cmd = cmd.substr(0, indexW) + " > " + cmd.substr(indexW+1, cmd.length()-indexW);
@@ -886,10 +886,8 @@ void RedirectionCommand::execute()
   char* app = strstr(cmd, ">>");
   if (app != nullptr) {
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
-      cout << args[i] << endl;
       if (strcmp(">>", args[i]) == 0 ) {
         *app = '\0';
-        cout << cmd << endl;
         close(1);
         open(args[i+1], O_WRONLY | O_APPEND | O_CREAT, 0777);
         cout << "test" << endl;
@@ -898,8 +896,7 @@ void RedirectionCommand::execute()
       }
     }
   }
-
-  else   if (over != nullptr) {
+  else if (over != nullptr) {
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
       if (strcmp(">", args[i]) == 0 ) {
         *over = '\0';
