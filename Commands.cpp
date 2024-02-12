@@ -398,10 +398,9 @@ void PipeCommand::execute(){
   splitString(this->m_cmd_line, cmd1, cmd2);
   int my_pipe[2];
   pipe(my_pipe);
-
-  if (true) { // son
-    cout << args1[0];
-    cout << args2[0];
+  cout << args1[0];
+  cout << args2[0];
+  /*if (fork()==0) { // son
     if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
@@ -411,8 +410,8 @@ void PipeCommand::execute(){
     cout << args1[0];
     cout << args2[0];
     string command = string(args1[0]);
-    //execvp(command.c_str(), args1);
-    //perror("failed 410");
+    execvp(command.c_str(), args1);
+    perror("failed 410");
    } 
   else {
     if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
@@ -422,9 +421,9 @@ void PipeCommand::execute(){
     close(my_pipe[0]);
     close(my_pipe[1]);
     string command = string(args2[0]);
-    //execvp(command.c_str(), args2);
-    //perror("failed 419");
-  }
+    execvp(command.c_str(), args2);
+    perror("failed 419");
+  }*/
 }
 
 
