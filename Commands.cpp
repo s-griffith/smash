@@ -233,12 +233,12 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     pid_t pid = fork();
     if(pid > 0){
       int status;
+      shell.m_pid_fg = pid;
       pid = waitpid(pid, &status, WUNTRACED);
       return nullptr;
     }
     else{
       setpgrp();
-      cout<<"231"<<endl;
       return new PipeCommand(cmd_line);
     
   }
@@ -854,7 +854,7 @@ void ExternalCommand::execute()
     if (execv(path, complexArgs) == -1)
     {
       perror("smash error: execv failed");
-      return;
+      exit(0);
     }
   }
   else
@@ -866,7 +866,7 @@ void ExternalCommand::execute()
     {
       perror("smash error: evecvp failed");
       free(args);
-      return;
+      exit(0);
     }
     free(args);
   }
