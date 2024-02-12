@@ -364,7 +364,7 @@ void SmallShell::setPrevDir(char *prevDir)
 
 void splitString(const char* input, char*& firstPart, char*& secondPart) {
     // Find the delimiter '|' in the input string
-    char* delimiterPos = strchr(input, '|');
+    const char* delimiterPos = strchr(input, '|');
 
     // If the delimiter is found
     if (delimiterPos != nullptr) {
@@ -378,7 +378,7 @@ void splitString(const char* input, char*& firstPart, char*& secondPart) {
 
         // Allocate memory for the second part and copy characters
         secondPart = new char[strlen(delimiterPos + 1) + 1];
-        std::strcpy(secondPart, delimiterPos + 1);
+        strcpy(secondPart, delimiterPos + 1);
     } else {
         // If the delimiter is not found, set both parts to nullptr
         firstPart = nullptr;
