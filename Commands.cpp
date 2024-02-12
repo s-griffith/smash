@@ -74,7 +74,7 @@ void _removeBackgroundSign(char* cmd_line) {
     return;
   }
   // replace the & (background sign) with space and then remove all tailing spaces.
-  cmd_line[idx] = '';
+  cmd_line[idx] = ' ';
   // truncate the command line string up to the last non-space character
   cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
 }
@@ -139,7 +139,7 @@ bool is_number(const std::string &s) {
 }
 //-------------------------------------SmallShell-------------------------------------
 
-pid_t SmallShell::m_pid = getppid();
+pid_t SmallShell::m_pid = getppid();//maybe getpid?
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt), m_prevDir(nullptr), m_currDirectory(nullptr) {
    cout << "Constructor called..........\n";
@@ -362,15 +362,20 @@ void JobsList::removeFinishedJobs() {
       return;
     }
     if (kill(job->m_pid, signum) == SYS_FAIL) {
-                perror("smash error: kill failed");
-                return;
-            }
-             cout << "signal number " << signum << " was sent to pid " << job->m_pid << endl;
+      perror("smash error: kill failed");
+      return;
+    }
+    if (signum == SIGTSTP) {
+      job->m_isStopped = true;
+    } else if (signum == SIGCONT) {
+        job->m_isStopped = false;
+    }
+    cout << "signal number " << signum << " was sent to pid " << job->m_pid << endl;
    }
   //JobsList(){}
 
   //-------------------------------------ForeGround-------------------------------------
- ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line){}
+ ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void ForegroundCommand::execute(){
     int numArgs;
     char **args = getArgs(this->m_cmd_line, &numArgs);
@@ -379,14 +384,14 @@ void JobsList::removeFinishedJobs() {
      return;
     }
      SmallShell& smash = SmallShell::getInstance();
-     if(smash.getJobs()->isEmpty() && numArgs == 1)
+     if(m_jobs->isEmpty() && numArgs == 1)
     {
      cerr<< "smash error: fg: jobs list is empty"<<endl;
      return ;
     }
      int job_id;
      if(numArgs == 1){
-       job_id = smash.getJobs()->getMaxId();
+       job_id = m_jobs->getMaxId();
      }
      else try {
          if (!is_number(args[1]))
@@ -398,7 +403,7 @@ void JobsList::removeFinishedJobs() {
          return;
      }
     
-     JobsList::JobEntry *job = smash.getJobs()->getJobById(job_id);
+     JobsList::JobEntry *job = m_jobs->getJobById(job_id);
      if(!job){
        cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
        return;
@@ -417,7 +422,7 @@ void JobsList::removeFinishedJobs() {
       int status;
       cout << job->m_cmd << " : " << job_pid <<"&" << endl;
       smash.m_pid_fg = job_pid;
-      smash.getJobs()->removeJobById(job_id);
+      m_jobs->removeJobById(job_id);
       if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL) {
           perror("smash error: waitpid failed");
           //free_args(args, num_of_args);
@@ -438,7 +443,7 @@ void JobsList::removeFinishedJobs() {
     if(numArgs >1 && string(args[1]) == "kill"){
       cout<<"killing.....";
        SmallShell& smash = SmallShell::getInstance();
-       smash.getJobs()->killAllJobs();
+       m_jobs->killAllJobs();
     }
     exit(0);
  }
@@ -476,7 +481,7 @@ void JobsList::removeFinishedJobs() {
             return;
         }
          SmallShell &shell = SmallShell::getInstance();
-         shell.getJobs()->sigJobById(job_id, signum);
+         m_jobs->sigJobById(job_id, signum);
   }
   }
 
