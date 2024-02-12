@@ -238,8 +238,8 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     }
     else{
       setpgrp();
-      cout<<"231";
-      return new PipeCommand(cmd);
+      cout<<"231"<<endl;
+      return new PipeCommand(cmd_line);
     
   }
   }
@@ -383,7 +383,7 @@ void PipeCommand::execute(){
  // char cmd2[COMMAND_ARGS_MAX_LENGTH];
   string str1 = string(this->m_cmd_line);
   int pipeIndex = str1.find('|');
-   cout << pipeIndex;
+   cout << pipeIndex<< endl;
   string first = str1.substr(0, pipeIndex);
   string sec = str1.substr(pipeIndex+1);
   int numArgs1;
@@ -392,32 +392,26 @@ void PipeCommand::execute(){
   char **args2 = getArgs(sec.c_str(), &numArgs2);
   int my_pipe[2];
   pipe(my_pipe);
-  cout << args1[0];
-  cout << args2[0];
- /* if (fork()==0) { // son
-    if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
+ if (fork()==0) { // son
+    if (dup2(my_pipe[1], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     }
     close(my_pipe[0]);
     close(my_pipe[1]);
-    cout << args1[0];
-    cout << args2[0];
     string command = string(args1[0]);
     execvp(command.c_str(), args1);
     perror("failed 410");
    } 
   else {
-    if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
+    if (dup2(my_pipe[0], STDIN_FILENO) == -1) {
         //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     } 
-    close(my_pipe[0]);
-    close(my_pipe[1]);
     string command = string(args2[0]);
     execvp(command.c_str(), args2);
     perror("failed 419");
-  }*/
+  }
 }
 
 
