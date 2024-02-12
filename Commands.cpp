@@ -189,6 +189,24 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   {
     return nullptr;
   }
+  //Check if command is an IO redirection:
+  if (strstr(cmd_line, "<") != NULL || strstr(cmd_line, "<<") != NULL) {
+    pid_t pid = fork();
+    if (pid < 0)
+    {
+      perror("smash error: fork failed");
+      return nullptr;
+    }
+    else if (pid > 0) {
+      shell.m_pid_fg = pid;
+      while ((pid = waitpid(pid, &stat)) > 0);
+      return nullptr;
+    }
+    else {
+      setpgrp();
+      return new RedirectionCommand(cmd_line);
+    }
+  }
   // Removes background sign (if exists):
   char cmd[COMMAND_ARGS_MAX_LENGTH];
   strcpy(cmd, cmd_line);
@@ -245,8 +263,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     if (pid > 0 && !isBackground)
     {
       shell.m_pid_fg = pid;
-      while ((pid = wait(&stat)) > 0)
-        ; // check if need to do wait with specific pid
+      while ((pid = waitpid(pid, &stat)) > 0);
       return nullptr;
     }
     if (pid == 0)
@@ -278,10 +295,6 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
-  if (dynamic_cast<ExternalCommand *>(cmd) != nullptr)
-  {
-    exit(0);
-  }
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
@@ -769,4 +782,33 @@ RedirectionCommand::RedirectionCommand(const char *cmd_line) : Command(cmd_line)
 
 void RedirectionCommand::execute()
 {
+  int numArgs = 0;
+  char** args = getArgs(this->m_cmd_line, &numArgs);
+  SmallShell& smash = SmallShell::getInstance();
+  char* over = strstr(cmd_line, "<");
+  char* app = strstr(cmd_line, "<<");
+  if (over != nullptr) {
+    for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
+      if (strcmp("<", args[i]) == 0 ) {
+        basic_ofstream(args[i+1], ios_base::out);
+        char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
+        strcpy(cmd, this->m_cmd_line);
+        cmd[over] = " ";
+        smash.executeCommand(cmd);
+        exit(0);
+      }
+    }
+  }
+  if (app != nullptr) {
+    for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
+      if (strcmp("<<", args[i]) == 0 ) {
+        basic_ofstream(args[i+1], ios_base::app);
+        char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
+        strcpy(cmd, this->m_cmd_line);
+        cmd[app] = " ";
+        smash.executeCommand(cmd);
+        exit(0);
+      }
+    }
+  }
 }
