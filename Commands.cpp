@@ -386,7 +386,7 @@ void splitString(const char* input, char*& firstPart, char*& secondPart) {
     }
 }
 //-------------------------------------Pipe-------------------------------------
-PipeCommand(const char *cmd_line): Command(cmd_line){}
+PipeCommand::PipeCommand(const char *cmd_line): Command(cmd_line){}
 void PipeCommand::execute(){
   
   char cmd1[COMMAND_ARGS_MAX_LENGTH];
