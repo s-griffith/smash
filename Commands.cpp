@@ -369,16 +369,16 @@ void SmallShell::setPrevDir(char *prevDir)
 PipeCommand::PipeCommand(const char *cmd_line): Command(cmd_line){}
 void PipeCommand::execute(){
   
-  char cmd1[COMMAND_ARGS_MAX_LENGTH];
-  char cmd2[COMMAND_ARGS_MAX_LENGTH];
+  //char cmd1[COMMAND_ARGS_MAX_LENGTH];
+ // char cmd2[COMMAND_ARGS_MAX_LENGTH];
   string str1 = string(this->m_cmd_line);
   int pipeIndex = str1.find('|');
   string first = str1.substr(0, pipeIndex);
   string sec = str1.substr(pipeIndex+1);
   int numArgs1;
-  char **args1 = getArgs(sec.c_str(), &numArgs1);
+  char **args1 = getArgs(first.c_str(), &numArgs1);
   int numArgs2;
-  char **args2 = getArgs(cmd2, &numArgs2);
+  char **args2 = getArgs(sec.c_str(), &numArgs2);
   int my_pipe[2];
   pipe(my_pipe);
   cout << args1[0];
