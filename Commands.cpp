@@ -45,7 +45,16 @@ int _parseCommandLine(const char *cmd_line, char **args)
 {
   FUNC_ENTRY()
   int i = 0;
-  std::istringstream iss(_trim(string(cmd_line)).c_str());
+  string cmd = string(cmd_line);
+  size_t indexA = string(cmd_line).find(">>");
+  size_t indexW = string(cmd_line).find(">");
+  if (indexA != string::npos) {
+    cmd = cmd.substr(0, indexA) + " >> " + cmd.substr(indexA+1, cmd.length()-indexA);
+  }
+  else if (indexW != string::npos) {
+    cmd = cmd.substr(0, indexW) + " > " + cmd.substr(indexW+1, cmd.length()-indexW);
+  }
+  std::istringstream iss(_trim(string(cmd)).c_str());
   for (std::string s; iss >> s;)
   {
     args[i] = (char *)malloc(s.length() + 1);
@@ -192,7 +201,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   }
   //Check if command is an IO redirection:
   SmallShell &shell = SmallShell::getInstance();
-  if (strstr(cmd_line, "<") != nullptr || strstr(cmd_line, "<<") != nullptr) {
+  if (strstr(cmd_line, ">") != nullptr || strstr(cmd_line, ">>") != nullptr) {
     int stat = 0;
     pid_t pid = fork();
     if (pid < 0)
@@ -815,26 +824,28 @@ void RedirectionCommand::execute()
   SmallShell& smash = SmallShell::getInstance();
   char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
   strcpy(cmd, this->m_cmd_line);
-  char* over = strstr(cmd, "<");
-  char* app = strstr(cmd, "<<");
-  if (over != nullptr) {
+  char* over = strstr(cmd, ">");
+  char* app = strstr(cmd, ">>");
+  if (app != nullptr) {
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
-      if (strcmp("<", args[i]) == 0 ) {
-        fclose(stdout);
-        FILE* stream = fopen(args[i+1], "w");
-        *over = ' ';
+      cout << args[i] << endl;
+      if (strcmp(">>", args[i]) == 0 ) {
+        *app = '\0';
         cout << cmd << endl;
+        close(stdout);
+        open(args[i+1], O_APPEND, O_CREAT);
         smash.executeCommand(cmd);
         exit(0);
       }
     }
   }
-  if (app != nullptr) {
+
+  else   if (over != nullptr) {
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
-      if (strcmp("<<", args[i]) == 0 ) {
+      if (strcmp(">", args[i]) == 0 ) {
+        *over = '\0';
         fclose(stdout);
-        FILE* stream = fopen(args[i+1], "a");
-        *app = ' ';
+        fopen(args[i+1], "w");
         smash.executeCommand(cmd);
         exit(0);
       }
