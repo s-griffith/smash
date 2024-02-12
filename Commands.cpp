@@ -354,7 +354,7 @@ void ChmodCommand::execute(){
     }
     //std::bitset<9> bits(permissionsNum);
     if(chmod(args[0], static_cast<mode_t>(permissionsNum)) != 0){
-        perror("smash error: chmod failed")
+        perror("smash error: chmod failed");
     }
 
 }
