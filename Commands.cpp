@@ -233,7 +233,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   }
   else if (firstWord.compare("chmod") == 0)
   {
-    return new KillCommand(cmd_line);
+    return new ChmodCommand(cmd_line);
   }
   // others
   else
