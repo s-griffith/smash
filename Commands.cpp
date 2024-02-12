@@ -820,7 +820,7 @@ void RedirectionCommand::execute()
         basic_ofstream(args[i+1], ios_base::out);
         char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
         strcpy(cmd, this->m_cmd_line);
-        cmd[over] = " ";
+        cmd[over] = ' ';
         smash.executeCommand(cmd);
         exit(0);
       }
@@ -832,7 +832,7 @@ void RedirectionCommand::execute()
         basic_ofstream(args[i+1], ios_base::app);
         char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
         strcpy(cmd, this->m_cmd_line);
-        cmd[app] = " ";
+        cmd[app] = ' ';
         smash.executeCommand(cmd);
         exit(0);
       }
