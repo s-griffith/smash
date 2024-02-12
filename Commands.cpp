@@ -282,6 +282,35 @@ void SmallShell::setPrevDir(char* prevDir){
   strcpy(m_prevDir, prevDir);
 }
 
+//-------------------------------------Chmod-------------------------------------
+ChmodCommand::ChmodCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
+void ChmodCommand::execute(){
+   int permissionsNum;
+   int numArgs;
+    char **args = getArgs(this->m_cmd_line, &numArgs);
+    if(numArgs !=3 ){
+      cerr << "smash error: chmod: invalid arguments" << endl;
+      return;
+    }
+    try {
+         if (!is_number(args[1]))
+             throw exception();
+         permissionsNum = stoi(args[1]);
+     } catch (exception &) {
+         cerr << "smash error: chmod: invalid arguments" << endl;
+         return;
+     }
+    if(permissionsNum<0 || permissionsNum>777){
+      cerr << "smash error: chmod: invalid arguments" << endl;
+      return;
+    }
+    //std::bitset<9> bits(permissionsNum);
+    if(chmod(args[0], static_cast<mode_t>(permissionsNum)) != 0){
+        perror("smash error: chmod failed")
+    }
+
+}
+
 
 //-------------------------------------Jobs-------------------------------------
 JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped): m_id(id), m_pid(pid), m_isStopped(isStopped) {
