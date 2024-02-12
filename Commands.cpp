@@ -407,7 +407,9 @@ void PipeCommand::execute(){
     close(my_pipe[0]);
     close(my_pipe[1]);
     execvp(args1[0], args1);
-  } else {
+    perror("failed 410");
+   } 
+  else {
     if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
         //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
@@ -415,6 +417,7 @@ void PipeCommand::execute(){
     close(my_pipe[0]);
     close(my_pipe[1]);
     execvp(args2[0], args2);
+    perror("failed 419");
   }
 }
 
