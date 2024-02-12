@@ -379,7 +379,7 @@ void splitString(const char* input, char* firstPart, char* secondPart) {
 
         // Allocate memory for the second part and copy characters
         secondPart = new char[strlen(input) -firstPartLength + 1];
-        strcpy(secondPart, delimiterPos + 1);
+        strcpy(secondPart, delimiterPos + 1, strlen(input) -firstPartLength);
     } else {
         // If the delimiter is not found, set both parts to nullptr
         firstPart = nullptr;
