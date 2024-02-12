@@ -391,11 +391,11 @@ void PipeCommand::execute(){
   
   char cmd1[COMMAND_ARGS_MAX_LENGTH];
   char cmd2[COMMAND_ARGS_MAX_LENGTH];
+   splitString(this->m_cmd_line, cmd1, cmd2);
   int numArgs1;
   char **args1 = getArgs(cmd1, &numArgs1);
   int numArgs2;
   char **args2 = getArgs(cmd2, &numArgs2);
-  splitString(this->m_cmd_line, cmd1, cmd2);
   int my_pipe[2];
   pipe(my_pipe);
   cout << args1[0];
