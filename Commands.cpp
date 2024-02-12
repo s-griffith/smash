@@ -373,6 +373,7 @@ void PipeCommand::execute(){
  // char cmd2[COMMAND_ARGS_MAX_LENGTH];
   string str1 = string(this->m_cmd_line);
   int pipeIndex = str1.find('|');
+   cout << pipeIndex;
   string first = str1.substr(0, pipeIndex);
   string sec = str1.substr(pipeIndex+1);
   int numArgs1;
