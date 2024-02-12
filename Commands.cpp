@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <iomanip>
 #include "Commands.h"
 
@@ -248,6 +249,10 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   {
     return new KillCommand(cmd_line, &jobs);
   }
+  else if (firstWord.compare("chmod") == 0)
+  {
+    return new ChmodCommand(cmd_line);
+  }
   // others
   else
   {
@@ -341,6 +346,32 @@ void SmallShell::setPrevDir(char *prevDir)
 {
   strcpy(m_prevDir, prevDir);
 }
+
+//-------------------------------------Chmod-------------------------------------
+ChmodCommand::ChmodCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
+void ChmodCommand::execute(){
+   int permissionsNum;
+   int numArgs;
+    char **args = getArgs(this->m_cmd_line, &numArgs);
+    if(numArgs !=3 ){
+      cerr << "smash error: chmod: invalid arguments" << endl;
+      return;
+    }
+    if (!is_number(args[1])){
+        cerr << "smash error: chmod: invalid arguments" << endl;
+         return;    
+    }
+    permissionsNum = stoi(args[1], nullptr, 8);
+    if((permissionsNum<0 || permissionsNum>777)&&(permissionsNum>4777 || permissionsNum<4000)){
+      cerr << "smash error: chmod: invalid arguments" << endl;
+      return;
+    }
+    if(chmod(args[2], permissionsNum) != 0){
+        perror("smash error: chmod failed");
+    }
+
+}
+
 
 //-------------------------------------Jobs-------------------------------------
 JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped) : m_id(id), m_pid(pid), m_isStopped(isStopped)
@@ -483,18 +514,13 @@ void ForegroundCommand::execute()
   {
     job_id = m_jobs->getMaxId();
   }
-  else
-    try
-    {
-      if (!is_number(args[1]))
-        throw exception();
-      job_id = stoi(args[1]);
-    }
-    catch (exception &)
+  else if (!is_number(args[1]))
     {
       cerr << "smash error: fg: invalid arguments" << endl;
-      // free_args(args, num_of_args);
       return;
+      }
+  else{
+      job_id = stoi(args[1]);
     }
   JobsList::JobEntry *job = m_jobs->getJobById(job_id);
   if (!job)
@@ -540,6 +566,7 @@ void ForegroundCommand::execute()
     smash.m_pid_fg = 0;
   }
 }
+
 
 //-------------------------------------Quit-------------------------------------
 QuitCommand::QuitCommand(const char *cmd_line, JobsList *jobs) : BuiltInCommand(cmd_line), m_jobs(jobs) {}
