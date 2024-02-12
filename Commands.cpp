@@ -223,7 +223,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     pid_t pid = fork();
     if(pid > 0){
       int status;
-      pid = waitpid(pid, &status, WUNTRACED)
+      pid = waitpid(pid, &status, WUNTRACED);
       return nullptr;
     }
     else{
@@ -364,7 +364,7 @@ void SmallShell::setPrevDir(char *prevDir)
 
 void splitString(const char* input, char*& firstPart, char*& secondPart) {
     // Find the delimiter '|' in the input string
-    char* delimiterPos = std::strchr(input, '|');
+    char* delimiterPos = strchr(input, '|');
 
     // If the delimiter is found
     if (delimiterPos != nullptr) {
@@ -373,11 +373,11 @@ void splitString(const char* input, char*& firstPart, char*& secondPart) {
 
         // Allocate memory for the first part and copy characters
         firstPart = new char[firstPartLength + 1];
-        std::strncpy(firstPart, input, firstPartLength);
+        strncpy(firstPart, input, firstPartLength);
         firstPart[firstPartLength] = '\0'; // Null-terminate the first part
 
         // Allocate memory for the second part and copy characters
-        secondPart = new char[std::strlen(delimiterPos + 1) + 1];
+        secondPart = new char[strlen(delimiterPos + 1) + 1];
         std::strcpy(secondPart, delimiterPos + 1);
     } else {
         // If the delimiter is not found, set both parts to nullptr
