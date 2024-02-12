@@ -896,7 +896,7 @@ void RedirectionCommand::execute()
       if (strcmp(">>", args[i]) == 0 ) {
         *app = '\0';
         cout << cmd << endl;
-        close(stdout);
+        close(1);
         open(args[i+1], O_RDWR | O_APPEND | O_CREAT);
         smash.executeCommand(cmd);
         exit(0);
