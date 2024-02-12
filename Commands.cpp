@@ -358,6 +358,7 @@ void ChmodCommand::execute(){
     }
     //std::bitset<9> bits(permissionsNum);
     permissionsNum &= 0777;
+    cout << "number:  "<< permissionsNum;
     if(chmod(args[2], permissionsNum) != 0){
         perror("smash error: chmod failed");
     }
