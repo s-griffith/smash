@@ -392,7 +392,7 @@ void PipeCommand::execute(){
   
   /*char cmd1[COMMAND_ARGS_MAX_LENGTH];
   char cmd2[COMMAND_ARGS_MAX_LENGTH];
-   splitString(this->m_cmd_line, cmd1, cmd2);
+   splitString(this->m_cmd_line, cmd1, cmd2);*/
   int numArgs1;
   char **args1 = getArgs(cmd1, &numArgs1);
   int numArgs2;
@@ -401,7 +401,7 @@ void PipeCommand::execute(){
   pipe(my_pipe);
   cout << args1[0];
   cout << args2[0];
-  if (fork()==0) { // son
+ /* if (fork()==0) { // son
     if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
