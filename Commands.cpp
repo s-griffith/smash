@@ -229,6 +229,20 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   string cmd_s = _trim(string(cmd_line_clean));
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
   // Find appropriate command:
+  if(strchr(cmd, '|')){
+    pid_t pid = fork();
+    if(pid > 0){
+      int status;
+      pid = waitpid(pid, &status, WUNTRACED);
+      return nullptr;
+    }
+    else{
+      setpgrp();
+      cout<<"231";
+      return new PipeCommand(cmd);
+    
+  }
+  }
   if (firstWord.compare("pwd") == 0)
   {
     return new GetCurrDirCommand(cmd_line);
@@ -358,6 +372,55 @@ void SmallShell::setPrevDir(char *prevDir)
   strcpy(m_prevDir, prevDir);
 }
 
+
+
+
+//-------------------------------------Pipe-------------------------------------
+PipeCommand::PipeCommand(const char *cmd_line): Command(cmd_line){}
+void PipeCommand::execute(){
+  
+  //char cmd1[COMMAND_ARGS_MAX_LENGTH];
+ // char cmd2[COMMAND_ARGS_MAX_LENGTH];
+  string str1 = string(this->m_cmd_line);
+  int pipeIndex = str1.find('|');
+   cout << pipeIndex;
+  string first = str1.substr(0, pipeIndex);
+  string sec = str1.substr(pipeIndex+1);
+  int numArgs1;
+  char **args1 = getArgs(first.c_str(), &numArgs1);
+  int numArgs2;
+  char **args2 = getArgs(sec.c_str(), &numArgs2);
+  int my_pipe[2];
+  pipe(my_pipe);
+  cout << args1[0];
+  cout << args2[0];
+ /* if (fork()==0) { // son
+    if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
+        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
+        return;
+    }
+    close(my_pipe[0]);
+    close(my_pipe[1]);
+    cout << args1[0];
+    cout << args2[0];
+    string command = string(args1[0]);
+    execvp(command.c_str(), args1);
+    perror("failed 410");
+   } 
+  else {
+    if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
+        //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
+        return;
+    } 
+    close(my_pipe[0]);
+    close(my_pipe[1]);
+    string command = string(args2[0]);
+    execvp(command.c_str(), args2);
+    perror("failed 419");
+  }*/
+}
+
+
 //-------------------------------------Chmod-------------------------------------
 ChmodCommand::ChmodCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
 void ChmodCommand::execute(){
@@ -373,7 +436,7 @@ void ChmodCommand::execute(){
          return;    
     }
     permissionsNum = stoi(args[1], nullptr, 8);
-    if((permissionsNum<0 || permissionsNum>777)&&(permissionsNum>4777 || permissionsNum<4000)){
+    if((permissionsNum<0 || permissionsNum>777) && !(permissionsNum<4777 && permissionsNum>4000)){
       cerr << "smash error: chmod: invalid arguments" << endl;
       return;
     }
