@@ -400,6 +400,8 @@ void PipeCommand::execute(){
   pipe(my_pipe);
 
   if (true) { // son
+    cout << args1[0];
+    cout << args2[0];
     if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
