@@ -141,7 +141,7 @@ bool is_number(const std::string &s) {
 
 //-------------------------------------SmallShell-------------------------------------
 
-pid_t SmallShell::m_pid = getppid();//maybe getpid?
+pid_t SmallShell::m_pid = getpid();//maybe getpid?
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt) {
   m_prevDir = (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
@@ -279,22 +279,24 @@ void SmallShell::setPrevDir(char* prevDir){
 
 
 //-------------------------------------Jobs-------------------------------------
-JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped): m_id(id), m_pid(pid), m_cmd(cmd), m_isStopped(isStopped){}
- 
+JobsList::JobEntry::JobEntry(int id, pid_t pid, const char* cmd, bool isStopped): m_id(id), m_pid(pid), m_isStopped(isStopped) {
+  m_cmd = (char*)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char));
+  strcpy(m_cmd, cmd);
+}
+
  
  void JobsList::addJob(const char* cmd, pid_t pid, bool isStopped){
   removeFinishedJobs(); //think on a better way to update maxId!!!!
-    JobEntry newJob(max_id +1, pid, cmd, isStopped);
-    this->m_list.push_back(newJob);
-    max_id++;
+  JobEntry newJob(max_id +1, pid, cmd, isStopped);
+  this->m_list.push_back(newJob);
+  max_id++;
  }
 void JobsList::printJobsList(){
   removeFinishedJobs();
   int i=1;
   for (JobEntry job : m_list) {
      // element.job.second
-        std::cout << "["<< i << "] "<< job.m_cmd << "&"<< endl;
-        ///TODO: remove the last space!!!
+        std::cout << "["<< i << "] "<< job.m_cmd << endl;
         i++;
     }
 }
@@ -581,7 +583,7 @@ void ChangeDirCommand::execute() {
     free(args);
     return;
   }
-  else if (*m_plastPwd == nullptr && string(args[1]) == "-") {
+  else if (!strcmp(*m_plastPwd, "") && string(args[1]) == "-") {
     cerr << "smash error: cd: OLDPWD not set" << endl;
     free(args);
     return;
@@ -642,8 +644,12 @@ void ExternalCommand::execute() {
     }
   }
   else {
+    char cmd[COMMAND_ARGS_MAX_LENGTH];
+    strcpy(cmd, this->m_cmd_line);
+    _removeBackgroundSign(cmd);
+    const char* cmd_line_clean = cmd;
     int numArgs = 0;
-    char** args = getArgs(this->m_cmd_line, &numArgs);
+    char** args = getArgs(cmd_line_clean, &numArgs);
     string command = string(args[0]);
     if (execvp(command.c_str(), args) == -1) {
       perror("smash error: evecvp failed");
