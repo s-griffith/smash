@@ -232,6 +232,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
       return new PipeCommand(cmd);
     
   }
+  }
   if (firstWord.compare("pwd") == 0)
   {
     return new GetCurrDirCommand(cmd_line);
