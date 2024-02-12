@@ -362,7 +362,7 @@ void SmallShell::setPrevDir(char *prevDir)
 
 
 
-void splitString(const char* input, char*& firstPart, char*& secondPart) {
+void splitString(const char* input, char* firstPart, char* secondPart) {
     // Find the delimiter '|' in the input string
     const char* delimiterPos = strchr(input, '|');
 
