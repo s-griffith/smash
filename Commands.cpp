@@ -199,6 +199,18 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   string cmd_s = _trim(string(cmd_line_clean));
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
   // Find appropriate command:
+  if(strchr(cmd, '|')){
+    pid_t pid = fork();
+    if(pid > 0){
+      int status;
+      pid = waitpid(pid, &status, WUNTRACED)
+      return nullptr;
+    }
+    else{
+      setpgrp();
+      return new PipeCommand(cmd);
+    }
+  }
   if (firstWord.compare("pwd") == 0)
   {
     return new GetCurrDirCommand(cmd_line);
@@ -333,6 +345,66 @@ void SmallShell::setPrevDir(char *prevDir)
 {
   strcpy(m_prevDir, prevDir);
 }
+
+
+
+void splitString(const char* input, char*& firstPart, char*& secondPart) {
+    // Find the delimiter '|' in the input string
+    char* delimiterPos = std::strchr(input, '|');
+
+    // If the delimiter is found
+    if (delimiterPos != nullptr) {
+        // Calculate the length of the first part
+        int firstPartLength = delimiterPos - input;
+
+        // Allocate memory for the first part and copy characters
+        firstPart = new char[firstPartLength + 1];
+        std::strncpy(firstPart, input, firstPartLength);
+        firstPart[firstPartLength] = '\0'; // Null-terminate the first part
+
+        // Allocate memory for the second part and copy characters
+        secondPart = new char[std::strlen(delimiterPos + 1) + 1];
+        std::strcpy(secondPart, delimiterPos + 1);
+    } else {
+        // If the delimiter is not found, set both parts to nullptr
+        firstPart = nullptr;
+        secondPart = nullptr;
+    }
+}
+//-------------------------------------Pipe-------------------------------------
+PipeCommand(const char *cmd_line): Command(cmd_line){}
+void PipeCommand::execute(){
+  
+  char cmd1[COMMAND_ARGS_MAX_LENGTH];
+  char cmd2[COMMAND_ARGS_MAX_LENGTH];
+  int numArgs1;
+  char **args1 = getArgs(cmd1, &numArgs);
+  int numArgs2;
+  char **args2 = getArgs(cmd2, &numArgs);
+  splitString(this->m_cmd_line, cmd1, cmd2);
+  int my_pipe[2];
+  pipe(my_pipe);
+
+  if (fork() == 0) { // son
+    if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
+        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
+        return 1;
+    }
+    close(my_pipe[0]);
+    close(my_pipe[1]);
+    execvp(args1[0], args1);
+  } else {
+    if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
+        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
+        return 1;
+    } 
+    close(my_pipe[0]);
+    close(my_pipe[1]);
+    execvp(args2[0], args2);
+  }
+  return 0;
+}
+
 
 //-------------------------------------Chmod-------------------------------------
 ChmodCommand::ChmodCommand(const char* cmd_line): BuiltInCommand(cmd_line){}
