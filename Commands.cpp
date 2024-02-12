@@ -392,17 +392,13 @@ void PipeCommand::execute(){
   char **args2 = getArgs(sec.c_str(), &numArgs2);
   int my_pipe[2];
   pipe(my_pipe);
-  cout << args1[0];
-  cout << args2[0];
- /* if (fork()==0) { // son
+ if (fork()==0) { // son
     if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     }
     close(my_pipe[0]);
     close(my_pipe[1]);
-    cout << args1[0];
-    cout << args2[0];
     string command = string(args1[0]);
     execvp(command.c_str(), args1);
     perror("failed 410");
@@ -412,12 +408,10 @@ void PipeCommand::execute(){
         //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     } 
-    close(my_pipe[0]);
-    close(my_pipe[1]);
     string command = string(args2[0]);
     execvp(command.c_str(), args2);
     perror("failed 419");
-  }*/
+  }
 }
 
 
