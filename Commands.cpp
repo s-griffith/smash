@@ -392,9 +392,9 @@ void PipeCommand::execute(){
   char cmd1[COMMAND_ARGS_MAX_LENGTH];
   char cmd2[COMMAND_ARGS_MAX_LENGTH];
   int numArgs1;
-  char **args1 = getArgs(cmd1, &numArgs);
+  char **args1 = getArgs(cmd1, &numArgs1);
   int numArgs2;
-  char **args2 = getArgs(cmd2, &numArgs);
+  char **args2 = getArgs(cmd2, &numArgs2);
   splitString(this->m_cmd_line, cmd1, cmd2);
   int my_pipe[2];
   pipe(my_pipe);
@@ -416,7 +416,6 @@ void PipeCommand::execute(){
     close(my_pipe[1]);
     execvp(args2[0], args2);
   }
-  return 0;
 }
 
 
