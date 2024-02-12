@@ -402,15 +402,15 @@ void PipeCommand::execute(){
   if (fork() == 0) { // son
     if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
-        return 1;
+        return;
     }
     close(my_pipe[0]);
     close(my_pipe[1]);
     execvp(args1[0], args1);
   } else {
     if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
-        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
-        return 1;
+        //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
+        return;
     } 
     close(my_pipe[0]);
     close(my_pipe[1]);
