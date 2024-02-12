@@ -6,7 +6,7 @@
 
 #define COMMAND_ARGS_MAX_LENGTH (200)
 #define COMMAND_MAX_ARGS (20)
-#define MAX_PATH_LEGNTH (80)
+#define MAX_PATH_LENGTH (80)
 
 class Command {
 protected:
