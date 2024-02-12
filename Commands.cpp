@@ -453,13 +453,8 @@ void JobsList::removeFinishedJobs() {
   //-------------------------------------Quit-------------------------------------
   QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void  QuitCommand::execute(){
-      //Remove background sign if exists:
-  char cmd[COMMAND_ARGS_MAX_LENGTH];
-  strcpy(cmd, this->m_cmd_line);
-  _removeBackgroundSign(cmd);
-  const char* cmd_line_clean = cmd;
   int numArgs=0;
-  char** args = getArgs(cmd_line_clean, &numArgs);
+  char** args = getArgs(this->m_cmd_line, &numArgs);
     if(numArgs >1 && string(args[1]) == "kill"){
       m_jobs->killAllJobs();
     }
@@ -469,15 +464,10 @@ void JobsList::removeFinishedJobs() {
   //-------------------------------------Kill-------------------------------------
   KillCommand::KillCommand(const char* cmd_line, JobsList* jobs): BuiltInCommand(cmd_line), m_jobs(jobs){}
   void KillCommand::execute(){
-    //Remove background sign if exists: ADD TO NUMARGS FUNCTION INSTEAD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    char cmd[COMMAND_ARGS_MAX_LENGTH];
-    strcpy(cmd, this->m_cmd_line);
-    _removeBackgroundSign(cmd);
-    const char* cmd_line_clean = cmd;
     int num_of_args;
     int job_id;
     int signum;
-    char **args = getArgs(cmd_line_clean, &num_of_args);
+    char **args = getArgs(this->m_cmd_line, &num_of_args);
     if (num_of_args < 3) {
         cerr << "smash error: kill: invalid arguments" << endl;
         free(args);
@@ -544,13 +534,8 @@ ChangePromptCommand::ChangePromptCommand(const char* cmd_line) : BuiltInCommand:
 ChangePromptCommand::~ChangePromptCommand() {}
 
 void ChangePromptCommand::execute() {
-  //Remove background sign if exists:
-  char cmd[COMMAND_ARGS_MAX_LENGTH];
-  strcpy(cmd, this->m_cmd_line);
-  _removeBackgroundSign(cmd);
-  const char* cmd_line_clean = cmd;
   int numArgs = 0;
-  char** args = getArgs(cmd_line_clean, &numArgs);
+  char** args = getArgs(this->m_cmd_line, &numArgs);
   SmallShell& smash = SmallShell::getInstance();
   if (numArgs == 1) {
     smash.chngPrompt();
@@ -589,17 +574,11 @@ ChangeDirCommand::ChangeDirCommand(const char* cmd_line, char** plastPwd) : Buil
 ///TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute() {
   SmallShell& smash = SmallShell::getInstance();
-  //Removes background sign (if exists):
-  char cmd[COMMAND_ARGS_MAX_LENGTH];
-  strcpy(cmd, this->m_cmd_line);
-  _removeBackgroundSign(cmd);
-  const char* cmd_line_clean = cmd;
-  
   if(!strcmp(smash.getCurrDir(), "")) {
     firstUpdateCurrDir();
   }
   int numArgs = 0;
-  char** args = getArgs(cmd_line_clean, &numArgs);
+  char** args = getArgs(this->m_cmd_line, &numArgs);
   if (numArgs > 2) { //the command itself counts as an arg
     cerr << "smash error: cd: too many arguments" << endl;
     free(args);
