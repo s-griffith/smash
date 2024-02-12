@@ -375,7 +375,6 @@ void PipeCommand::execute(){
   int pipeIndex = str1.find('|');
   string first = str1.substr(0, pipeIndex);
   string sec = str1.substr(pipeIndex+1);
-   splitString(first.c_str(), cmd1, cmd2);
   int numArgs1;
   char **args1 = getArgs(sec.c_str(), &numArgs1);
   int numArgs2;
