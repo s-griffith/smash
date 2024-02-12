@@ -408,7 +408,8 @@ void PipeCommand::execute(){
     close(my_pipe[1]);
     cout << args1[0];
     cout << args2[0];
-    execvp(args1[0], args1);
+    string command = string(args1[0]);
+    execvp(command.c_str(), args1);
     perror("failed 410");
    } 
   else {
@@ -418,7 +419,8 @@ void PipeCommand::execute(){
     } 
     close(my_pipe[0]);
     close(my_pipe[1]);
-    execvp(args2[0], args2);
+    string command = string(args2[0]);
+    execvp(command.c_str(), args2);
     perror("failed 419");
   }
 }
