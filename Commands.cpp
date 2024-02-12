@@ -890,7 +890,6 @@ void RedirectionCommand::execute()
         *app = '\0';
         close(1);
         open(args[i+1], O_WRONLY | O_APPEND | O_CREAT, 0777);
-        cout << "test" << endl;
         smash.executeCommand(cmd);
         exit(0);
       }
@@ -900,8 +899,8 @@ void RedirectionCommand::execute()
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
       if (strcmp(">", args[i]) == 0 ) {
         *over = '\0';
-        fclose(stdout);
-        fopen(args[i+1], "w");
+        close(1);
+        open(args[i+1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
         smash.executeCommand(cmd);
         exit(0);
       }
