@@ -190,7 +190,8 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
    return new KillCommand(cmd_line, &jobs);
   }
 //others
-  else {    
+  else {  
+    SmallShell& shell = SmallShell::getInstance();  
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
@@ -199,44 +200,22 @@ Command * SmallShell::CreateCommand(const char* cmd_line) {
       return nullptr;
     }
     if (pid > 0 && !isBackground) {
-      while ((pid = wait(&stat)) > 0);
+      shell.m_pid_fg = pid;
+      while ((pid = wait(&stat)) > 0); //check if need to do wait with specific pid
       return nullptr;
     }
-    if (pid == 0 && !isBackground) {
+    if (pid == 0) {
       setpgrp();
       return new ExternalCommand(cmd_line);
     }
-    else if (pid == 0 && isBackground) {
-      setpgrp();
-      //Add to jobs list!!!!
-      //Can a complex command be run in the background?
-    int stat = 0;
-    ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
-    SmallShell &shell = SmallShell::getInstance();
-    pid_t pid = fork();
-    if (pid < 0) {
-      perror("smash error: fork failed");
-    }
-    if (pid > 0 && !isBackground) {
-      shell.m_pid_fg = pid;
-      while ((pid = wait(&stat)) > 0);//if a background son will finish? maybe waitpid
+    else if (pid > 0 && isBackground){
+      shell.getJobs()->addJob(cmd_line, pid);
       return nullptr;
-    }
-    if (pid == 0 && !isBackground) {
-      setpgrp();
-      return cmd;
-    }
-    else if  (pid > 0 && isBackground){
-      shell.getJobs()->addJob(cmd, pid);
-    }
-    else if (pid == 0 && isBackground) {
-      setpgrp();
-      return cmd;
-    }
     }
   }
   return nullptr;
 }
+
 JobsList* SmallShell::getJobs(){
   return &jobs;
 }
