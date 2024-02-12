@@ -267,7 +267,6 @@ void SmallShell::setCurrDir(char* currDir, char* toCombine) {
   strcat(temp, "/");
   strcat(temp, toCombine);
   strcpy(m_currDirectory, temp);
-  cout << m_currDirectory << endl;
 }
 
 char* SmallShell::getPrevDir() const {
@@ -300,6 +299,7 @@ void JobsList::printJobsList(){
         i++;
     }
 }
+
 
 JobsList::JobEntry * JobsList::getJobById(int jobId){
   for(auto& job : m_list){
@@ -356,13 +356,12 @@ void JobsList::removeFinishedJobs() {
  void JobsCommand::execute(){
     SmallShell& smash = SmallShell::getInstance();
     smash.getJobs()->printJobsList();
-  
  }
   void JobsList::killAllJobs(){
     cout<<"smash: sending SIGKILL signal to " << m_list.size()<< " jobs:"<<endl;
     removeFinishedJobs();
     for (JobEntry element : m_list) {
-      cout<<element.m_pid<< ": "<<element.m_cmd << "&"<<endl;//remove space
+      cout<<element.m_pid<< ": "<<element.m_cmd <<endl;//remove space
       kill(element.m_pid, SIGKILL);
     }
   }
@@ -389,19 +388,14 @@ void JobsList::removeFinishedJobs() {
   //-------------------------------------ForeGround-------------------------------------
  ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void ForegroundCommand::execute(){
+    //Remove background sign if exists:
+  char cmd[COMMAND_ARGS_MAX_LENGTH];
+  strcpy(cmd, this->m_cmd_line);
+  _removeBackgroundSign(cmd);
+  const char* cmd_line_clean = cmd;
     int numArgs;
-    char **args = getArgs(this->m_cmd_line, &numArgs);
-    if(numArgs > 2){
-      cerr << "smash error: fg: invalid arguments" << endl;
-     return;
-    }
-     SmallShell& smash = SmallShell::getInstance();
-     if(m_jobs->isEmpty() && numArgs == 1)
-    {
-     cerr<< "smash error: fg: jobs list is empty"<<endl;
-     return ;
-    }
-     int job_id;
+    char **args = getArgs(cmd_line_clean, &numArgs);
+    int job_id;
      if(numArgs == 1){
        job_id = m_jobs->getMaxId();
      }
@@ -414,12 +408,20 @@ void JobsList::removeFinishedJobs() {
          //free_args(args, num_of_args);
          return;
      }
-    
-     JobsList::JobEntry *job = m_jobs->getJobById(job_id);
-     if(!job){
-       cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
-       return;
-     }
+    JobsList::JobEntry *job = m_jobs->getJobById(job_id);
+    if(!job){
+      cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
+      return;
+    }
+    if(m_jobs->isEmpty()) {
+      cerr<< "smash error: fg: jobs list is empty"<<endl;
+      return ;
+    }
+    if(numArgs > 2){
+      cerr << "smash error: fg: invalid arguments" << endl;
+     return;
+    }
+     SmallShell& smash = SmallShell::getInstance();
      if (job_id >= 0 && job) {
       int job_pid = job->m_pid;
       if (job->m_isStopped) {
@@ -432,7 +434,7 @@ void JobsList::removeFinishedJobs() {
       }
          
       int status;
-      cout << job->m_cmd << " : " << job_pid <<"&" << endl;
+      cout << job->m_cmd << " " << job_pid << endl;
       smash.m_pid_fg = job_pid;
       m_jobs->removeJobById(job_id);
       if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL) {
@@ -450,10 +452,14 @@ void JobsList::removeFinishedJobs() {
   //-------------------------------------Quit-------------------------------------
   QuitCommand::QuitCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void  QuitCommand::execute(){
+      //Remove background sign if exists:
+  char cmd[COMMAND_ARGS_MAX_LENGTH];
+  strcpy(cmd, this->m_cmd_line);
+  _removeBackgroundSign(cmd);
+  const char* cmd_line_clean = cmd;
   int numArgs=0;
-  char** args = getArgs(this->m_cmd_line, &numArgs);
+  char** args = getArgs(cmd_line_clean, &numArgs);
     if(numArgs >1 && string(args[1]) == "kill"){
-      cout<<"killing.....";
       m_jobs->killAllJobs();
     }
     exit(0);
@@ -462,15 +468,21 @@ void JobsList::removeFinishedJobs() {
   //-------------------------------------Kill-------------------------------------
   KillCommand::KillCommand(const char* cmd_line, JobsList* jobs): BuiltInCommand(cmd_line), m_jobs(jobs){}
   void KillCommand::execute(){
+    //Remove background sign if exists: ADD TO NUMARGS FUNCTION INSTEAD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    char cmd[COMMAND_ARGS_MAX_LENGTH];
+    strcpy(cmd, this->m_cmd_line);
+    _removeBackgroundSign(cmd);
+    const char* cmd_line_clean = cmd;
     int num_of_args;
-    char **args = getArgs(this->m_cmd_line, &num_of_args);
-    
-    if (num_of_args != 3) {
+    int job_id;
+    int signum;
+    char **args = getArgs(cmd_line_clean, &num_of_args);
+    if (num_of_args < 3) {
         cerr << "smash error: kill: invalid arguments" << endl;
-    } else {
-
-        int signum;
-        int job_id;
+        free(args);
+        return;
+    } 
+    else {
         try {
             // Check for a valid job-id
             if (!is_number(args[2]))
@@ -488,10 +500,19 @@ void JobsList::removeFinishedJobs() {
             signum = stoi(string(args[1]).erase(0, 1));
         } catch (exception &) {
             cerr << "smash error: kill: invalid arguments" << endl;
-            //free_args(args, num_of_args);
             return;
         }
-        m_jobs->sigJobById(job_id, signum);
+    SmallShell& smash = SmallShell::getInstance();
+    JobsList::JobEntry *job = smash.getJobs()->getJobById(job_id);
+    if(!job){
+      cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
+      return;
+    }
+    if (num_of_args > 3) {
+      cerr << "smash error: kill: invalid arguments" << endl;
+      return;
+    }
+    m_jobs->sigJobById(job_id, signum);
   }
   }
 
