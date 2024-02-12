@@ -891,7 +891,8 @@ void RedirectionCommand::execute()
         *app = '\0';
         cout << cmd << endl;
         close(1);
-        open(args[i+1], O_RDWR | O_APPEND | O_CREAT);
+        open(args[i+1], O_WRONLY | O_APPEND | O_CREAT, 0777);
+        cout << "test" << endl;
         smash.executeCommand(cmd);
         exit(0);
       }
