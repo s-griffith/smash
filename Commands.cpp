@@ -220,16 +220,16 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
   // Find appropriate command:
   if(strchr(cmd, '|')){
-    pid_t pid = fork();
+    /*pid_t pid = fork();
     if(pid > 0){
       int status;
       pid = waitpid(pid, &status, WUNTRACED);
       return nullptr;
     }
     else{
-      setpgrp();
+      setpgrp();*/
       return new PipeCommand(cmd);
-    }
+    
   }
   if (firstWord.compare("pwd") == 0)
   {
