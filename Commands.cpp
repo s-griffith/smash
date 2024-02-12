@@ -348,7 +348,7 @@ void ChmodCommand::execute(){
         cerr << "smash error: chmod: invalid arguments" << endl;
          return;    
     }
-    permissionsNum = stoi(args[1]);
+    permissionsNum = stoi(args[1], nullptr, 8);
     if(permissionsNum<0 || permissionsNum>777){
       cerr << "smash error: chmod: invalid arguments" << endl;
       return;
