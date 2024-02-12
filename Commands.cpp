@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <iomanip>
 #include "Commands.h"
 
