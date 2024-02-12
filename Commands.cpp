@@ -84,13 +84,19 @@ void _removeBackgroundSign(char* cmd_line) {
 
 
 char** getArgs(const char* cmd_line, int* numArgs) {
-  char** args = (char**)malloc(COMMAND_ARGS_MAX_LENGTH * sizeof(char*) + 1 + 1);
+  //Remove background sign if exists:
+  char cmd[COMMAND_ARGS_MAX_LENGTH];
+  strcpy(cmd, cmd_line);
+  _removeBackgroundSign(cmd);
+  const char* cmd_line_clean = cmd;
+
+  char** args = (char**)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char*));
   if (args == nullptr) {
    perror("smash error: malloc failed");
    free(args);
    return nullptr; 
   }
-  *numArgs = _parseCommandLine(cmd_line, args);
+  *numArgs = _parseCommandLine(cmd_line_clean, args);
   return args;
 }
 
@@ -141,7 +147,7 @@ bool is_number(const std::string &s) {
 
 //-------------------------------------SmallShell-------------------------------------
 
-pid_t SmallShell::m_pid = getpid();//maybe getpid?
+pid_t SmallShell::m_pid = getpid();
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt) {
   m_prevDir = (char*)malloc((MAX_PATH_LENGTH + 1)*sizeof(char));
@@ -388,13 +394,8 @@ void JobsList::removeFinishedJobs() {
   //-------------------------------------ForeGround-------------------------------------
  ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void ForegroundCommand::execute(){
-    //Remove background sign if exists:
-  char cmd[COMMAND_ARGS_MAX_LENGTH];
-  strcpy(cmd, this->m_cmd_line);
-  _removeBackgroundSign(cmd);
-  const char* cmd_line_clean = cmd;
     int numArgs;
-    char **args = getArgs(cmd_line_clean, &numArgs);
+    char **args = getArgs(cmd_line, &numArgs);
     int job_id;
      if(numArgs == 1){
        job_id = m_jobs->getMaxId();
@@ -665,12 +666,8 @@ void ExternalCommand::execute() {
     }
   }
   else {
-    char cmd[COMMAND_ARGS_MAX_LENGTH];
-    strcpy(cmd, this->m_cmd_line);
-    _removeBackgroundSign(cmd);
-    const char* cmd_line_clean = cmd;
     int numArgs = 0;
-    char** args = getArgs(cmd_line_clean, &numArgs);
+    char** args = getArgs(this->m_cmd_line, &numArgs);
     string command = string(args[0]);
     if (execvp(command.c_str(), args) == -1) {
       perror("smash error: evecvp failed");
