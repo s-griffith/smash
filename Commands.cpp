@@ -395,7 +395,7 @@ void JobsList::removeFinishedJobs() {
  ForegroundCommand::ForegroundCommand(const char* cmd_line, JobsList* jobs):BuiltInCommand(cmd_line), m_jobs(jobs){}
  void ForegroundCommand::execute(){
     int numArgs;
-    char **args = getArgs(cmd_line, &numArgs);
+    char **args = getArgs(this->m_cmd_line, &numArgs);
     int job_id;
      if(numArgs == 1){
        job_id = m_jobs->getMaxId();
