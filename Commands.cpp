@@ -231,6 +231,10 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   {
     return new KillCommand(cmd_line, &jobs);
   }
+  else if (firstWord.compare("chmod") == 0)
+  {
+    return new KillCommand(cmd_line);
+  }
   // others
   else
   {
