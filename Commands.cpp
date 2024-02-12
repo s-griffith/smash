@@ -190,6 +190,26 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   {
     return nullptr;
   }
+  //Check if command is an IO redirection:
+  SmallShell &shell = SmallShell::getInstance();
+  if (strstr(cmd_line, "<") != nullptr || strstr(cmd_line, "<<") != nullptr) {
+    int stat = 0;
+    pid_t pid = fork();
+    if (pid < 0)
+    {
+      perror("smash error: fork failed");
+      return nullptr;
+    }
+    else if (pid > 0) {
+      shell.m_pid_fg = pid;
+      pid = waitpid(pid, &stat, WUNTRACED);
+      return nullptr;
+    }
+    else {
+      setpgrp();
+      return new RedirectionCommand(cmd_line);
+    }
+  }
   // Removes background sign (if exists):
   char cmd[COMMAND_ARGS_MAX_LENGTH];
   strcpy(cmd, cmd_line);
@@ -250,7 +270,6 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   // others
   else
   {
-    SmallShell &shell = SmallShell::getInstance();
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
@@ -262,8 +281,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     if (pid > 0 && !isBackground)
     {
       shell.m_pid_fg = pid;
-      while ((pid = wait(&stat)) > 0)
-        ; // check if need to do wait with specific pid
+      pid = waitpid(pid, &stat, WUNTRACED);
       return nullptr;
     }
     if (pid == 0)
@@ -295,10 +313,6 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
-  if (dynamic_cast<ExternalCommand *>(cmd) != nullptr)
-  {
-    exit(0);
-  }
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
@@ -868,4 +882,34 @@ RedirectionCommand::RedirectionCommand(const char *cmd_line) : Command(cmd_line)
 
 void RedirectionCommand::execute()
 {
+  int numArgs = 0;
+  char** args = getArgs(this->m_cmd_line, &numArgs);
+  SmallShell& smash = SmallShell::getInstance();
+  char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
+  strcpy(cmd, this->m_cmd_line);
+  char* over = strstr(cmd, "<");
+  char* app = strstr(cmd, "<<");
+  if (over != nullptr) {
+    for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
+      if (strcmp("<", args[i]) == 0 ) {
+        fclose(stdout);
+        FILE* stream = fopen(args[i+1], "w");
+        *over = ' ';
+        cout << cmd << endl;
+        smash.executeCommand(cmd);
+        exit(0);
+      }
+    }
+  }
+  if (app != nullptr) {
+    for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
+      if (strcmp("<<", args[i]) == 0 ) {
+        fclose(stdout);
+        FILE* stream = fopen(args[i+1], "a");
+        *app = ' ';
+        smash.executeCommand(cmd);
+        exit(0);
+      }
+    }
+  }
 }
