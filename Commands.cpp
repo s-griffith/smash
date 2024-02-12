@@ -344,20 +344,17 @@ void ChmodCommand::execute(){
       cerr << "smash error: chmod: invalid arguments" << endl;
       return;
     }
-    try {
-         if (!is_number(args[1]))
-             throw exception();
-         permissionsNum = stoi(args[1]);
-     } catch (exception &) {
-         cerr << "smash error: chmod: invalid arguments" << endl;
-         return;
-     }
+    if (!is_number(args[1])){
+        cerr << "smash error: chmod: invalid arguments" << endl;
+         return;    
+    }
+    permissionsNum = stoi(args[1]);
     if(permissionsNum<0 || permissionsNum>777){
       cerr << "smash error: chmod: invalid arguments" << endl;
       return;
     }
     //std::bitset<9> bits(permissionsNum);
-    permissionsNum &= 0777;
+    //permissionsNum &= 0777;
     cout << "number:  "<< permissionsNum << "args:  "<< args[1];
     if(chmod(args[2], permissionsNum) != 0){
         perror("smash error: chmod failed");
@@ -507,18 +504,13 @@ void ForegroundCommand::execute()
   {
     job_id = m_jobs->getMaxId();
   }
-  else
-    try
-    {
-      if (!is_number(args[1]))
-        throw exception();
-      job_id = stoi(args[1]);
-    }
-    catch (exception &)
+  else if (!is_number(args[1]))
     {
       cerr << "smash error: fg: invalid arguments" << endl;
-      // free_args(args, num_of_args);
       return;
+      }
+  else{
+      job_id = stoi(args[1]);
     }
   JobsList::JobEntry *job = m_jobs->getJobById(job_id);
   if (!job)
@@ -564,6 +556,7 @@ void ForegroundCommand::execute()
     smash.m_pid_fg = 0;
   }
 }
+
 
 //-------------------------------------Quit-------------------------------------
 QuitCommand::QuitCommand(const char *cmd_line, JobsList *jobs) : BuiltInCommand(cmd_line), m_jobs(jobs) {}
