@@ -406,6 +406,8 @@ void PipeCommand::execute(){
     }
     close(my_pipe[0]);
     close(my_pipe[1]);
+    cout << args1[0];
+    cout << args2[0];
     execvp(args1[0], args1);
     perror("failed 410");
    } 
