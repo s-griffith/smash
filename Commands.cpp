@@ -74,7 +74,7 @@ void _removeBackgroundSign(char* cmd_line) {
     return;
   }
   // replace the & (background sign) with space and then remove all tailing spaces.
-  cmd_line[idx] = ' ';
+  cmd_line[idx] = '';
   // truncate the command line string up to the last non-space character
   cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
 }
@@ -155,41 +155,42 @@ SmallShell::~SmallShell() {
 */
 Command * SmallShell::CreateCommand(const char* cmd_line) {
 	// For example:
+
   string cmd_s = _trim(string(cmd_line));
+  bool isBackground = _isBackgroundComamnd(cmd_line);
+  char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
+    strcpy(fixed_cmd, cmd_line);
+  _removeBackgroundSign(fixed_cmd);
   string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
 
   if (firstWord.compare("pwd") == 0) {
-    return new GetCurrDirCommand(cmd_line);
+    return new GetCurrDirCommand(fixed_cmd);
   }
   else if (firstWord.compare("showpid") == 0) {
-    return new ShowPidCommand(cmd_line);
+    return new ShowPidCommand(fixed_cmd);
   }
   else if (firstWord.compare("chprompt") == 0) {
-    return new ChangePromptCommand(cmd_line);
+    return new ChangePromptCommand(fixed_cmd);
   }
   else if (firstWord.compare("cd") == 0) {
-    return new ChangeDirCommand(cmd_line, &m_prevDir);
+    return new ChangeDirCommand(fixed_cmd, &m_prevDir);
   }
   else if (firstWord.compare("jobs") == 0) {
-    return new JobsCommand(cmd_line);
+    return new JobsCommand(fixed_cmd);
   }
   else if (firstWord.compare("quit") == 0) {
-   return new QuitCommand(cmd_line, &jobs);
+   return new QuitCommand(fixed_cmd, &jobs);
   }
   else if (firstWord.compare("fg") == 0) {
-   return new ForegroundCommand(cmd_line, &jobs);
+   return new ForegroundCommand(fixed_cmd, &jobs);
   }
    else if (firstWord.compare("kill") == 0) {
-   return new KillCommand(cmd_line, &jobs);
+   return new KillCommand(fixed_cmd, &jobs);
   }
 //others
   else {
     //Can a complex command be run in the background?
-    bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
-    char* fixed_cmd = (char*)malloc(MAX_PATH_LEGNTH*sizeof(char)+1);
-    strcpy(fixed_cmd, cmd_line);
-    _removeBackgroundSign(fixed_cmd);
     ExternalCommand *cmd = new ExternalCommand(fixed_cmd);
     SmallShell &shell = SmallShell::getInstance();
     pid_t pid = fork();
