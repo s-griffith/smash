@@ -363,38 +363,20 @@ void SmallShell::setPrevDir(char *prevDir)
 
 
 
-void splitString(const char* input, char* firstPart, char* secondPart) {
-    // Find the delimiter '|' in the input string
-    const char* delimiterPos = strchr(input, '|');
 
-    // If the delimiter is found
-    if (delimiterPos != nullptr) {
-        // Calculate the length of the first part
-        int firstPartLength = delimiterPos - input;
-
-        // Allocate memory for the first part and copy characters
-        firstPart = new char[firstPartLength + 1];
-        strncpy(firstPart, input, firstPartLength);
-        firstPart[firstPartLength] = '\0'; // Null-terminate the first part
-
-        // Allocate memory for the second part and copy characters
-        secondPart = new char[strlen(input) -firstPartLength + 1];
-        strcpy(secondPart, delimiterPos + 1, strlen(input) -firstPartLength);
-    } else {
-        // If the delimiter is not found, set both parts to nullptr
-        firstPart = nullptr;
-        secondPart = nullptr;
-    }
-}
 //-------------------------------------Pipe-------------------------------------
 PipeCommand::PipeCommand(const char *cmd_line): Command(cmd_line){}
 void PipeCommand::execute(){
   
   char cmd1[COMMAND_ARGS_MAX_LENGTH];
   char cmd2[COMMAND_ARGS_MAX_LENGTH];
-   splitString(this->m_cmd_line, cmd1, cmd2);
+  string str1 = string(this->m_cmd_line);
+  int pipeIndex = str1.find('|');
+  string first = str1.substr(0, pipeIndex);
+  string sec = str1.substr(pipeIndex+1);
+   splitString(first.c_str(), cmd1, cmd2);
   int numArgs1;
-  char **args1 = getArgs(cmd2, &numArgs1);
+  char **args1 = getArgs(sec.c_str(), &numArgs1);
   int numArgs2;
   char **args2 = getArgs(cmd2, &numArgs2);
   int my_pipe[2];
