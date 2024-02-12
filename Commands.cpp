@@ -191,7 +191,9 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     return nullptr;
   }
   //Check if command is an IO redirection:
-  if (strstr(cmd_line, "<") != NULL || strstr(cmd_line, "<<") != NULL) {
+  SmallShell &shell = SmallShell::getInstance();
+  if (strstr(cmd_line, "<") != nullptr || strstr(cmd_line, "<<") != nullptr) {
+    int stat = 0;
     pid_t pid = fork();
     if (pid < 0)
     {
@@ -200,7 +202,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     }
     else if (pid > 0) {
       shell.m_pid_fg = pid;
-      while ((pid = waitpid(pid, &stat)) > 0);
+      pid = waitpid(pid, &stat, WUNTRACED);
       return nullptr;
     }
     else {
@@ -256,7 +258,6 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   // others
   else
   {
-    SmallShell &shell = SmallShell::getInstance();
     bool isBackground = _isBackgroundComamnd(cmd_line);
     int stat = 0;
     pid_t pid = fork();
@@ -268,7 +269,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     if (pid > 0 && !isBackground)
     {
       shell.m_pid_fg = pid;
-      while ((pid = waitpid(pid, &stat)) > 0);
+      pid = waitpid(pid, &stat, WUNTRACED);
       return nullptr;
     }
     if (pid == 0)
@@ -812,15 +813,17 @@ void RedirectionCommand::execute()
   int numArgs = 0;
   char** args = getArgs(this->m_cmd_line, &numArgs);
   SmallShell& smash = SmallShell::getInstance();
-  char* over = strstr(cmd_line, "<");
-  char* app = strstr(cmd_line, "<<");
+  char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
+  strcpy(cmd, this->m_cmd_line);
+  char* over = strstr(cmd, "<");
+  char* app = strstr(cmd, "<<");
   if (over != nullptr) {
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
       if (strcmp("<", args[i]) == 0 ) {
-        basic_ofstream(args[i+1], ios_base::out);
-        char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
-        strcpy(cmd, this->m_cmd_line);
-        cmd[over] = ' ';
+        fclose(stdout);
+        FILE* stream = fopen(args[i+1], "w");
+        *over = ' ';
+        cout << cmd << endl;
         smash.executeCommand(cmd);
         exit(0);
       }
@@ -829,10 +832,9 @@ void RedirectionCommand::execute()
   if (app != nullptr) {
     for (int i = 0; i < COMMAND_MAX_ARGS; i++) {
       if (strcmp("<<", args[i]) == 0 ) {
-        basic_ofstream(args[i+1], ios_base::app);
-        char cmd[COMMAND_ARGS_MAX_LENGTH + 1];
-        strcpy(cmd, this->m_cmd_line);
-        cmd[app] = ' ';
+        fclose(stdout);
+        FILE* stream = fopen(args[i+1], "a");
+        *app = ' ';
         smash.executeCommand(cmd);
         exit(0);
       }
