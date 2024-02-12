@@ -378,7 +378,7 @@ void splitString(const char* input, char* firstPart, char* secondPart) {
         firstPart[firstPartLength] = '\0'; // Null-terminate the first part
 
         // Allocate memory for the second part and copy characters
-        secondPart = new char[strlen(delimiterPos + 1) + 1];
+        secondPart = new char[strlen(input) -firstPartLength + 1];
         strcpy(secondPart, delimiterPos + 1);
     } else {
         // If the delimiter is not found, set both parts to nullptr
@@ -390,13 +390,13 @@ void splitString(const char* input, char* firstPart, char* secondPart) {
 PipeCommand::PipeCommand(const char *cmd_line): Command(cmd_line){}
 void PipeCommand::execute(){
   
-  /*char cmd1[COMMAND_ARGS_MAX_LENGTH];
+  char cmd1[COMMAND_ARGS_MAX_LENGTH];
   char cmd2[COMMAND_ARGS_MAX_LENGTH];
-   splitString(this->m_cmd_line, cmd1, cmd2);*/
+   splitString(this->m_cmd_line, cmd1, cmd2);
   int numArgs1;
-  char **args1 = getArgs(this->m_cmd_line, &numArgs1);
+  char **args1 = getArgs(cmd2, &numArgs1);
   int numArgs2;
-  char **args2 = getArgs(this->m_cmd_line, &numArgs2);
+  char **args2 = getArgs(cmd2, &numArgs2);
   int my_pipe[2];
   pipe(my_pipe);
   cout << args1[0];
