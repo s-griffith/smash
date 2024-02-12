@@ -393,7 +393,7 @@ void PipeCommand::execute(){
   int my_pipe[2];
   pipe(my_pipe);
  if (fork()==0) { // son
-    if (dup2(my_pipe[0], STDOUT_FILENO) == -1) {
+    if (dup2(my_pipe[1], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     }
@@ -404,7 +404,7 @@ void PipeCommand::execute(){
     perror("failed 410");
    } 
   else {
-    if (dup2(my_pipe[1], STDIN_FILENO) == -1) {
+    if (dup2(my_pipe[0], STDIN_FILENO) == -1) {
         //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     } 
