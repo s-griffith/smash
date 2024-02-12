@@ -5,6 +5,7 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <iomanip>
 #include "Commands.h"
 
@@ -833,7 +834,7 @@ void RedirectionCommand::execute()
         *app = '\0';
         cout << cmd << endl;
         close(stdout);
-        open(args[i+1], O_APPEND, O_CREAT);
+        open(args[i+1], O_RDWR | O_APPEND | O_CREAT);
         smash.executeCommand(cmd);
         exit(0);
       }
