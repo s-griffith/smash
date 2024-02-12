@@ -228,6 +228,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     }
     else{
       setpgrp();*/
+      cout<<"231";
       return new PipeCommand(cmd);
     
   }
