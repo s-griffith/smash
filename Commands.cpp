@@ -333,7 +333,7 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
-  free(cmd);
+  delete cmd;
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
