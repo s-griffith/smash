@@ -715,6 +715,9 @@ void QuitCommand::execute()
   {
     m_jobs->killAllJobs();
   }
+  for (int i = 0; i < COMMAND_MAX_ARGS+1; i++) {
+    free(args[i]);
+  }
   free(args);
   exit(0);
 }
