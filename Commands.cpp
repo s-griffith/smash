@@ -718,7 +718,7 @@ void QuitCommand::execute()
   for (int i = 0; i < COMMAND_MAX_ARGS+1; i++) {
     free(args[i]);
   }
-  //free(args);
+  free(args);
   exit(0);
 }
 
