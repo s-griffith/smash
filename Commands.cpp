@@ -404,9 +404,17 @@ void PipeCommand::execute(){
   pipe(my_pipe);
  if (fork()==0) { // son
     setpgrp();
+    if(!isAmpersand){
     if (dup2(my_pipe[1], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
+    }
+    }
+    else{
+      if (dup2(my_pipe[1], 2) == -1) {
+        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
+        return;
+    }
     }
     close(my_pipe[0]);
     close(my_pipe[1]);
