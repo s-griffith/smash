@@ -476,9 +476,6 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped)
   strcpy(m_cmd, cmd);
 }
 
-JobsList::JobEntry::~JobEntry() {
-  free(m_cmd);
-}
 
 void JobsList::addJob(const char *cmd, pid_t pid, bool isStopped)
 {
@@ -541,6 +538,7 @@ void JobsList::removeFinishedJobs()
     int ret_wait = waitpid(job.m_pid, &status, WNOHANG);
     if (ret_wait == job.m_pid || ret_wait == -1)
     {
+      free(job.m_cmd);
       m_list.erase(it);
       --it;
     }

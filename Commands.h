@@ -116,7 +116,7 @@ public:
     bool m_isStopped;
     JobEntry() {}
     JobEntry(int id, pid_t pid, const char *cmd, bool isStopped = false);
-    ~JobEntry();
+    ~JobEntry() = default;
   };
 
 private:
