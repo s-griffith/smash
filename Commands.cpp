@@ -476,6 +476,10 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped)
   strcpy(m_cmd, cmd);
 }
 
+JobsList:JobsEntry::~JobEntry() {
+  free(m_cmd);
+}
+
 void JobsList::addJob(const char *cmd, pid_t pid, bool isStopped)
 {
   removeFinishedJobs(); // think on a better way to update maxId!!!!
