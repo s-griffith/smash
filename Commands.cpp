@@ -133,6 +133,7 @@ void firstUpdateCurrDir()
     perror("smash error: getcwd failed");
   }
   smash.setCurrDir(buffer);
+  free(buffer);
 }
 
 bool checkFullPath(char *currPath, char *newPath)
@@ -332,6 +333,7 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
+  free(cmd);
   // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
@@ -472,7 +474,6 @@ void ChmodCommand::execute(){
 //-------------------------------------Jobs-------------------------------------
 JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped) : m_id(id), m_pid(pid), m_isStopped(isStopped)
 {
-  //m_cmd = (char *)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char));
   strcpy(m_cmd, cmd);
 }
 
@@ -516,7 +517,6 @@ void JobsList::removeJobById(int jobId)
     auto job = *it;
     if (jobId == job.m_pid)
     {
-      //free(job.m_cmd);
       m_list.erase(it);
       --it;
       return;
@@ -539,7 +539,6 @@ void JobsList::removeFinishedJobs()
     int ret_wait = waitpid(job.m_pid, &status, WNOHANG);
     if (ret_wait == job.m_pid || ret_wait == -1)
     {
-      //free(job.m_cmd);
       m_list.erase(it);
       --it;
     }
@@ -574,7 +573,6 @@ void JobsList::killAllJobs()
   for (JobEntry element : m_list)
   {
     cout << element.m_pid << ": " << element.m_cmd << endl; // remove space
-    //free(element.m_cmd);
     kill(element.m_pid, SIGKILL);
   }
 }
