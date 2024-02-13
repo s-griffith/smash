@@ -368,6 +368,7 @@ void SmallShell::setCurrDir(char *currDir, char *toCombine)
   strcat(temp, "/");
   strcat(temp, toCombine);
   strcpy(m_currDirectory, temp);
+  free(temp);
 }
 
 char *SmallShell::getPrevDir() const
