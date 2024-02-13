@@ -516,6 +516,7 @@ void JobsList::removeJobById(int jobId)
     auto job = *it;
     if (jobId == job.m_pid)
     {
+      free(job.m_cmd);
       m_list.erase(it);
       --it;
       return;
@@ -573,6 +574,7 @@ void JobsList::killAllJobs()
   for (JobEntry element : m_list)
   {
     cout << element.m_pid << ": " << element.m_cmd << endl; // remove space
+    free(element.m_cmd);
     kill(element.m_pid, SIGKILL);
   }
 }
