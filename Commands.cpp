@@ -476,7 +476,7 @@ JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped)
   strcpy(m_cmd, cmd);
 }
 
-JobsList:JobsEntry::~JobEntry() {
+JobsList::JobsEntry::~JobEntry() {
   free(m_cmd);
 }
 
