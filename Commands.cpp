@@ -413,7 +413,8 @@ void PipeCommand::execute(){
     string command = string(args1[0]);
     execvp(command.c_str(), args1);
     perror("smash error: evecvp failed");
-    free(args);
+    free(args1);
+    free(args2);
     exit(0);
    } 
   else {
@@ -426,7 +427,8 @@ void PipeCommand::execute(){
     string command = string(args2[0]);
     execvp(command.c_str(), args2);
     perror("smash error: evecvp failed");
-    free(args);
+    free(args1);
+    free(args2);
     exit(0);
   }
 }
