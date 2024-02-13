@@ -900,7 +900,7 @@ void ExternalCommand::execute()
     string command = string(args[0]);
     if (execvp(command.c_str(), args) == -1)
     {
-      perror("smash error: evecvp failed");
+      perror("smash error: execvp failed");
       free(args);
       exit(0);
     }
