@@ -856,8 +856,7 @@ void ChangeDirCommand::execute()
   if (string(args[1]) == "..")
   {
     smash.setPrevDir(smash.getCurrDir());
-    cout << goUp(smash.getCurrDir()) << endl;
-    //smash.setCurrDir(goUp(smash.getCurrDir()));
+    goUp(smash.getCurrDir())
     return;
   }
   // If the new path is the full path, set currDir equal to it
