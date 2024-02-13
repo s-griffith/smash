@@ -109,6 +109,7 @@ char **getArgs(const char *cmd_line, int *numArgs)
   const char *cmd_line_clean = cmd;
 
   char **args = (char **)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char *));
+  std::fill_n(args, COMMAND_ARGS_MAX_LENGTH+1, '');
   if (args == nullptr)
   {
     perror("smash error: malloc failed");
