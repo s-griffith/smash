@@ -112,7 +112,7 @@ public:
   public:
     int m_id;
     pid_t m_pid;
-    char *m_cmd;
+    char m_cmd[COMMAND_ARGS_MAX_LENGTH + 1];
     bool m_isStopped;
     JobEntry() {}
     JobEntry(int id, pid_t pid, const char *cmd, bool isStopped = false);
