@@ -16,6 +16,7 @@ void ctrlCHandler(int sig_num) {
         return;
      }
      cout << "smash: process " << smash.m_pid_fg << " was killed" << endl;
+     smash.m_pid_fg = 0;
    }
 }
 

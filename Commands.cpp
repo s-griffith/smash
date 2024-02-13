@@ -137,6 +137,8 @@ void firstUpdateCurrDir()
 
 bool checkFullPath(char *currPath, char *newPath)
 {
+  if(newPath[0] == '/')
+  return true;
   int i = 0;
   int minLen = min(string(currPath).length(), string(newPath).length());
   for (; i < minLen; i++)
@@ -191,12 +193,14 @@ SmallShell::~SmallShell()
   free(m_currDirectory);
 }
 
+
+
 /**
  * Creates and returns a pointer to Command class which matches the given command line (cmd_line)
  */
 Command *SmallShell::CreateCommand(const char *cmd_line)
 {
-  if (cmd_line == nullptr)
+  if (string(cmd_line).empty())
   {
     return nullptr;
   }
@@ -213,6 +217,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     else if (pid > 0) {
       shell.m_pid_fg = pid;
       pid = waitpid(pid, &stat, WUNTRACED);
+      shell.m_pid_fg=0;
       return nullptr;
     }
     else {
@@ -235,6 +240,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
       int status;
       shell.m_pid_fg = pid;
       pid = waitpid(pid, &status, WUNTRACED);
+      shell.m_pid_fg=0;
       return nullptr;
     }
     else{
@@ -294,6 +300,7 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     {
       shell.m_pid_fg = pid;
       pid = waitpid(pid, &stat, WUNTRACED);
+      shell.m_pid_fg=0;
       return nullptr;
     }
     if (pid == 0)
@@ -383,9 +390,12 @@ void PipeCommand::execute(){
  // char cmd2[COMMAND_ARGS_MAX_LENGTH];
   string str1 = string(this->m_cmd_line);
   int pipeIndex = str1.find('|');
-   cout << pipeIndex<< endl;
-  string first = str1.substr(0, pipeIndex);
-  string sec = str1.substr(pipeIndex+1);
+  int isAmpersand = 0;
+  if(str1.find('&')!= string::npos){
+    isAmpersand = 1;
+  }
+  string first = str1.substr(0, pipeIndex+isAmpersand);
+  string sec = str1.substr(pipeIndex+ isAmpersand+1);
   int numArgs1;
   char **args1 = getArgs(first.c_str(), &numArgs1);
   int numArgs2;
@@ -393,6 +403,7 @@ void PipeCommand::execute(){
   int my_pipe[2];
   pipe(my_pipe);
  if (fork()==0) { // son
+    setpgrp();
     if (dup2(my_pipe[1], STDOUT_FILENO) == -1) {
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
@@ -401,16 +412,22 @@ void PipeCommand::execute(){
     close(my_pipe[1]);
     string command = string(args1[0]);
     execvp(command.c_str(), args1);
-    perror("failed 410");
+    perror("smash error: evecvp failed");
+    free(args);
+    exit(0);
    } 
   else {
     if (dup2(my_pipe[0], STDIN_FILENO) == -1) {
         //std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
     } 
+    close(my_pipe[0]);
+    close(my_pipe[1]);
     string command = string(args2[0]);
     execvp(command.c_str(), args2);
-    perror("failed 419");
+    perror("smash error: evecvp failed");
+    free(args);
+    exit(0);
   }
 }
 
@@ -462,13 +479,14 @@ void JobsList::printJobsList()
   for (JobEntry job : m_list)
   {
     // element.job.second
-    std::cout << "[" << i << "] " << job.m_cmd << endl;
+    std::cout << "[" << job.m_id << "] " << job.m_cmd << endl;
     i++;
   }
 }
 
 JobsList::JobEntry *JobsList::getJobById(int jobId)
 {
+ removeFinishedJobs();
   for (auto &job : m_list)
   {
     if (job.m_id == jobId)
@@ -537,8 +555,8 @@ void JobsCommand::execute()
 }
 void JobsList::killAllJobs()
 {
-  cout << "smash: sending SIGKILL signal to " << m_list.size() << " jobs:" << endl;
   removeFinishedJobs();
+  cout << "smash: sending SIGKILL signal to " << m_list.size() << " jobs:" << endl;
   for (JobEntry element : m_list)
   {
     cout << element.m_pid << ": " << element.m_cmd << endl; // remove space
@@ -578,10 +596,16 @@ void ForegroundCommand::execute()
   int numArgs;
   char **args = getArgs(this->m_cmd_line, &numArgs);
   int job_id;
-  if (numArgs == 1)
-  {
+  if (numArgs == 1){
+    if(m_jobs->isEmpty()){
+       cerr << "smash error: fg: jobs list is empty" << endl;
+       return;
+     }
+    {
     job_id = m_jobs->getMaxId();
+    }
   }
+  
   else if (!is_number(args[1]))
     {
       cerr << "smash error: fg: invalid arguments" << endl;
@@ -663,20 +687,28 @@ void KillCommand::execute()
     free(args);
     return;
   }
-  else
-  {
     try
     {
-      // Check for a valid job-id
+     SmallShell &smash = SmallShell::getInstance();
+     // Check for a valid job-id
       if (!is_number(args[2]))
         throw exception();
+       job_id = stoi(args[2]);
+       
+     JobsList::JobEntry *job = smash.getJobs()->getJobById(job_id);
+     if (!job)
+    {
+      cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
+      return;
+    }
+    
+        // Check for a valid signal number
+
       char first_char = string(args[1]).at(0);
       char minus = '-';
       if (first_char != minus)
         throw exception();
-      job_id = stoi(args[2]);
-
-      // Check for a valid signal number
+  
 
       if (!is_number(string(args[1]).erase(0, 1)))
         throw exception();
@@ -687,13 +719,7 @@ void KillCommand::execute()
       cerr << "smash error: kill: invalid arguments" << endl;
       return;
     }
-    SmallShell &smash = SmallShell::getInstance();
-    JobsList::JobEntry *job = smash.getJobs()->getJobById(job_id);
-    if (!job)
-    {
-      cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
-      return;
-    }
+    
     if (num_of_args > 3)
     {
       cerr << "smash error: kill: invalid arguments" << endl;
@@ -701,7 +727,7 @@ void KillCommand::execute()
     }
     m_jobs->sigJobById(job_id, signum);
   }
-}
+
 
 //-------------------------------------Command-------------------------------------
 
