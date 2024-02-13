@@ -109,15 +109,25 @@ char **getArgs(const char *cmd_line, int *numArgs)
   const char *cmd_line_clean = cmd;
 
   char **args = (char **)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char *));
-  std::fill_n(args, COMMAND_ARGS_MAX_LENGTH+1, nullptr);
+
   if (args == nullptr)
   {
     perror("smash error: malloc failed");
     free(args);
     return nullptr;
   }
+  std::fill_n(args, COMMAND_ARGS_MAX_LENGTH + 1, nullptr);
   *numArgs = _parseCommandLine(cmd_line_clean, args);
   return args;
+}
+
+void deleteArgs(char **args)
+{
+  for (int i = 0; i < COMMAND_MAX_ARGS + 1; i++)
+  {
+    free(args[i]);
+  }
+  free(args);
 }
 
 void firstUpdateCurrDir()
@@ -417,8 +427,8 @@ void PipeCommand::execute()
     {
       if (dup2(my_pipe[1], STDOUT_FILENO) == -1)
       {
-        free(args1);
-        free(args2);
+        deleteArgs(args1);
+        deleteArgs(args2);
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
       }
@@ -427,8 +437,8 @@ void PipeCommand::execute()
     {
       if (dup2(my_pipe[1], 2) == -1)
       {
-        free(args1);
-        free(args2);
+        deleteArgs(args1);
+        deleteArgs(args2);
         std::cerr << "Failed to redirect stdout to pipe." << std::endl;
         return;
       }
@@ -438,8 +448,8 @@ void PipeCommand::execute()
     string command = string(args1[0]);
     execvp(command.c_str(), args1);
     perror("smash error: evecvp failed");
-    free(args1);
-    free(args2);
+    deleteArgs(args1);
+    deleteArgs(args2);
     exit(0);
   }
   else
@@ -454,8 +464,8 @@ void PipeCommand::execute()
     string command = string(args2[0]);
     execvp(command.c_str(), args2);
     perror("smash error: evecvp failed");
-    free(args1);
-    free(args2);
+    deleteArgs(args1);
+    deleteArgs(args2);
     exit(0);
   }
 }
@@ -470,28 +480,28 @@ void ChmodCommand::execute()
   if (numArgs != 3)
   {
     cerr << "smash error: chmod: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   if (!is_number(args[1]))
   {
     cerr << "smash error: chmod: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   permissionsNum = stoi(args[1], nullptr, 8);
   if ((permissionsNum < 0 || permissionsNum > 777) && !(permissionsNum < 4777 && permissionsNum > 4000))
   {
     cerr << "smash error: chmod: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   if (chmod(args[2], permissionsNum) != 0)
   {
-    free(args);
+    deleteArgs(args);
     perror("smash error: chmod failed");
   }
-  free(args);
+  deleteArgs(args);
 }
 
 //-------------------------------------Jobs-------------------------------------
@@ -636,7 +646,7 @@ void ForegroundCommand::execute()
     if (m_jobs->isEmpty())
     {
       cerr << "smash error: fg: jobs list is empty" << endl;
-      free(args);
+      deleteArgs(args);
       return;
     }
     {
@@ -647,7 +657,7 @@ void ForegroundCommand::execute()
   else if (!is_number(args[1]))
   {
     cerr << "smash error: fg: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   else
@@ -658,19 +668,19 @@ void ForegroundCommand::execute()
   if (!job)
   {
     cerr << "smash error: fg: job-id " << job_id << " does not exist" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   if (m_jobs->isEmpty())
   {
     cerr << "smash error: fg: jobs list is empty" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   if (numArgs > 2)
   {
     cerr << "smash error: fg: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   SmallShell &smash = SmallShell::getInstance();
@@ -682,7 +692,7 @@ void ForegroundCommand::execute()
       if (kill(job_pid, SIGCONT) == SYS_FAIL)
       {
         perror("smash error: kill failed");
-        free(args);
+        deleteArgs(args);
         // free_args(args, num_of_args);
         /// TODO: check free
         return;
@@ -696,14 +706,14 @@ void ForegroundCommand::execute()
     if (waitpid(job_pid, &status, WUNTRACED) == SYS_FAIL)
     {
       perror("smash error: waitpid failed");
-      free(args);
+      deleteArgs(args);
       // free_args(args, num_of_args);
       return;
     }
     smash.m_pid_fg = 0;
-    free(args);
+    deleteArgs(args);
   }
-  free(args);
+  deleteArgs(args);
 }
 
 //-------------------------------------Quit-------------------------------------
@@ -716,10 +726,11 @@ void QuitCommand::execute()
   {
     m_jobs->killAllJobs();
   }
-  for (int i = 0; i < COMMAND_MAX_ARGS+1; i++) {
-    free(args[i]);
+  for (int i = 0; i < COMMAND_MAX_ARGS + 1; i++)
+  {
+    deleteArgs(args[i]);
   }
-  free(args);
+  deleteArgs(args);
   exit(0);
 }
 
@@ -734,7 +745,7 @@ void KillCommand::execute()
   if (num_of_args < 3)
   {
     cerr << "smash error: kill: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   try
@@ -749,7 +760,7 @@ void KillCommand::execute()
     if (!job)
     {
       cerr << "smash error: kill: job-id " << job_id << " does not exist" << endl;
-      free(args);
+      deleteArgs(args);
       return;
     }
 
@@ -767,18 +778,18 @@ void KillCommand::execute()
   catch (exception &)
   {
     cerr << "smash error: kill: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
 
   if (num_of_args > 3)
   {
     cerr << "smash error: kill: invalid arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   m_jobs->sigJobById(job_id, signum);
-  free(args);
+  deleteArgs(args);
 }
 
 //-------------------------------------Command-------------------------------------
@@ -818,7 +829,7 @@ void ChangePromptCommand::execute()
   {
     smash.chngPrompt(string(args[1]));
   }
-  free(args);
+  deleteArgs(args);
 }
 
 //-------------------------------------ShowPidCommand-------------------------------------
@@ -862,13 +873,13 @@ void ChangeDirCommand::execute()
   if (numArgs > 2)
   { // the command itself counts as an arg
     cerr << "smash error: cd: too many arguments" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   else if (!strcmp(*m_plastPwd, "") && string(args[1]) == "-")
   {
     cerr << "smash error: cd: OLDPWD not set" << endl;
-    free(args);
+    deleteArgs(args);
     return;
   }
   else if (string(args[1]) == "-")
@@ -876,7 +887,7 @@ void ChangeDirCommand::execute()
     if (chdir(*m_plastPwd) != 0)
     {
       perror("smash error: chdir failed");
-      free(args);
+      deleteArgs(args);
       return;
     }
     // switch current and previous directories
@@ -885,13 +896,13 @@ void ChangeDirCommand::execute()
     // char* temp = smash.getCurrDir();
     smash.setCurrDir(smash.getPrevDir());
     smash.setPrevDir(temp);
-    free(args);
+    deleteArgs(args);
     return;
   }
   if (chdir(args[1]) != 0)
   {
     perror("smash error: chdir failed");
-    free(args);
+    deleteArgs(args);
     return;
   }
   // If the given "path" is to go up, remove the last part of the current path
@@ -899,7 +910,7 @@ void ChangeDirCommand::execute()
   {
     smash.setPrevDir(smash.getCurrDir());
     goUp(smash.getCurrDir());
-    free(args);
+    deleteArgs(args);
     return;
   }
   // If the new path is the full path, set currDir equal to it
@@ -916,7 +927,7 @@ void ChangeDirCommand::execute()
     // Figure out how to move the string into a char without allocating memory here and not being able to delete it
     smash.setCurrDir(smash.getCurrDir(), args[1]);
   }
-  free(args);
+  deleteArgs(args);
 }
 
 //-------------------------------------ExternalCommand-------------------------------------
@@ -946,7 +957,7 @@ void ExternalCommand::execute()
     if (execvp(command.c_str(), args) == -1)
     {
       perror("smash error: execvp failed");
-      free(args);
+      deleteArgs(args);
       exit(0);
     }
     free(args);
@@ -975,7 +986,7 @@ void RedirectionCommand::execute()
         close(1);
         open(args[i + 1], O_WRONLY | O_APPEND | O_CREAT, 0777);
         smash.executeCommand(cmd);
-        free(args);
+        deleteArgs(args);
         exit(0);
       }
     }
@@ -990,7 +1001,7 @@ void RedirectionCommand::execute()
         close(1);
         open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
         smash.executeCommand(cmd);
-        free(args);
+        deleteArgs(args);
         exit(0);
       }
     }
