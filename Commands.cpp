@@ -726,10 +726,6 @@ void QuitCommand::execute()
   {
     m_jobs->killAllJobs();
   }
-  for (int i = 0; i < COMMAND_MAX_ARGS + 1; i++)
-  {
-    deleteArgs(args[i]);
-  }
   deleteArgs(args);
   exit(0);
 }
