@@ -96,7 +96,6 @@ public:
   void execute() override;
 };
 
-
 /*
  *  PipeCommand Class:
  *  This class represents a pipe Command of SmallShell.
@@ -104,7 +103,6 @@ public:
 class PipeCommand : public Command
 {
 public:
-
   /*
    * Constructor of PipeCommand class
    * @param cmd_line - the given CMD line
@@ -135,7 +133,6 @@ public:
 class RedirectionCommand : public Command
 {
 public:
-
   /*
    * Constructor of RedirectionCommand class
    * @param cmd_line - the given CMD line
@@ -166,7 +163,6 @@ public:
 class ChangeDirCommand : public BuiltInCommand
 {
 public:
-
   /*
    * Constructor of ChangeDirCommand class
    * @param cmd_line - the given CMD line
@@ -198,7 +194,6 @@ private:
   char **m_plastPwd;
 };
 
-
 /*
  *  GetCurrDirCommand Class:
  *  This class represents a pwd Command of SmallShell.
@@ -206,7 +201,6 @@ private:
 class GetCurrDirCommand : public BuiltInCommand
 {
 public:
-
   /*
    * Constructor of GetCurrDirCommand class
    * @param cmd_line - the given CMD line
@@ -237,7 +231,6 @@ public:
 class ShowPidCommand : public BuiltInCommand
 {
 public:
-
   /*
    * Constructor of ShowPidCommand class
    * @param cmd_line - the given CMD line
@@ -268,7 +261,6 @@ public:
 class ChangePromptCommand : public BuiltInCommand
 {
 public:
-
   /*
    * Constructor of ChangePromptCommand class
    * @param cmd_line - the given CMD line
@@ -298,7 +290,6 @@ public:
  */
 class JobsList;
 
-
 /*
  *  QuitCommand Class:
  *  This class represents a quit Command of SmallShell.
@@ -306,8 +297,27 @@ class JobsList;
 class QuitCommand : public BuiltInCommand
 {
 public:
+  /*
+   * Constructor of QuitCommand class
+   * @param cmd_line - the given CMD line
+   * @param jobs - the list of jobs in SmallShell
+   * @return
+   *      A new instance of QuitCommand.
+   */
   QuitCommand(const char *cmd_line, JobsList *jobs);
+
+  /*
+   * Destructor of the QuitCommand class
+   */
   virtual ~QuitCommand() {}
+
+  /*
+   * Execute function of the QuitCommand class:
+   * Executes the quit command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 
 private:
@@ -318,9 +328,17 @@ private:
   JobsList *m_jobs;
 };
 
+/*
+ *  JobsList Class:
+ *  This class represents the list of jobs in SmallShell.
+ */
 class JobsList
 {
-public:
+private:
+  /*
+   *  JobEntry Class:
+   *  This class represents a job in the list of jobs in SmallShell.
+   */
   class JobEntry
   {
   public:
