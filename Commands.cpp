@@ -191,20 +191,21 @@ bool is_number(const std::string &s)
 
 //-------------------------------------SmallShell-------------------------------------
 
-pid_t SmallShell::m_pid = getpid();
+//pid_t SmallShell::m_pid = getpid();
 
 SmallShell::SmallShell(std::string prompt) : m_prompt(prompt)
 {
+  pid_t SmallShell::m_pid = getpid();
   m_prevDir = (char *)malloc((MAX_PATH_LENGTH + 1) * sizeof(char));
   strcpy(m_prevDir, "");
-  m_currDirectory = (char *)malloc((MAX_PATH_LENGTH + 1) * sizeof(char));
-  strcpy(m_currDirectory, "");
+  m_currDir = (char *)malloc((MAX_PATH_LENGTH + 1) * sizeof(char));
+  strcpy(m_currDir, "");
 }
 
 SmallShell::~SmallShell()
 {
   free(m_prevDir);
-  free(m_currDirectory);
+  free(m_currDir);
 }
 
 /**
@@ -369,13 +370,13 @@ void SmallShell::chngPrompt(const std::string newPrompt)
 
 char *SmallShell::getCurrDir() const
 {
-  return m_currDirectory;
+  return m_currDir;
 }
 void SmallShell::setCurrDir(char *currDir, char *toCombine)
 {
   if (toCombine == nullptr)
   {
-    strcpy(m_currDirectory, currDir);
+    strcpy(m_currDir, currDir);
     return;
   }
   int length = string(currDir).length() + string(toCombine).length() + 2;
@@ -389,7 +390,7 @@ void SmallShell::setCurrDir(char *currDir, char *toCombine)
   strcpy(temp, currDir);
   strcat(temp, "/");
   strcat(temp, toCombine);
-  strcpy(m_currDirectory, temp);
+  strcpy(m_currDir, temp);
   free(temp);
 }
 
