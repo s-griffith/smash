@@ -335,6 +335,87 @@ private:
 class JobsList
 {
 public:
+
+  /*
+   * Constructor of JobsList class
+   * Receives no parameters.
+   * @return
+   *      A new instance of JobsList.
+   */
+  JobsList() = default;
+
+  /*
+   * Destructor of the JobsList class
+   */
+  ~JobsList() = default;
+
+  /*
+   * Adds a job to the jobs list
+   * @param cmd - The CMD command received
+   * @param pid - The PID of the job to be added
+   * @param isStopped - Whether the job has been stopped
+   * @return 
+   *    void
+   */
+  void addJob(const char *cmd, pid_t pid, bool isStopped = false);
+
+  /*
+   * Prints the list of jobs
+   * Receives no parameters.
+   * @return 
+   *    void
+   */
+  void printJobsList();
+
+  /*
+   * Kills all jobs in the jobs list
+   * Receives no parameters.
+   * @return 
+   *    void
+   */
+  void killAllJobs();
+
+  /*
+   * Retrieves a specific job according to its ID
+   * @param jobId - The job's ID
+   * @return 
+   *    JobEntry* - A pointer to the requested job
+   */
+  JobEntry *getJobById(int jobId);
+
+  /*
+   * Handles signals sent to a specific job
+   * @param jobId - The job's ID
+   * @param signum - The signal number sent
+   * @return 
+   *    void
+   */
+  void sigJobById(int jobId, int signum);
+
+  /*
+   * Removes a job from the jobs list according to its ID
+   * @param jobId - The job's ID
+   * @return 
+   *    void
+   */
+  void removeJobById(int jobId);
+
+  /*
+   * Determines whether the list of jobs is empty
+   * Receives no parameters.
+   * @return 
+   *    bool - whether the jobs list is empty
+   */
+  bool isEmpty();
+
+  /*
+   * Returns the current largest used ID in the jobs list
+   * Receives no parameters.
+   * @return 
+   *    int - the current largest used ID in the jobs list
+   */
+  int getMaxId();
+
   /*
    *  JobEntry Class:
    *  This class represents a job in the list of jobs in SmallShell.
@@ -352,24 +433,18 @@ public:
   };
 
 private:
+
+  /*
+   * Removes finished jobs from the list of jobs
+   * Receives no parameters.
+   * @return 
+   *    void
+   */
+  void removeFinishedJobs();
+
+
   std::vector<JobEntry> m_list;
   int max_id = 0;
-  // TODO: Add your data members
-public:
-  JobsList() = default;
-  ~JobsList() = default;
-  void addJob(const char *cmd, pid_t pid, bool isStopped = false);
-  void printJobsList();
-  void killAllJobs();
-  void removeFinishedJobs();
-  JobEntry *getJobById(int jobId);
-  void sigJobById(int jobId, int signum);
-  void removeJobById(int jobId);
-  JobEntry *getLastJob(int *lastJobId);
-  JobEntry *getLastStoppedJob(int *jobId);
-  bool isEmpty();
-  int getMaxId();
-  // TODO: Add extra methods or modify exisitng ones as needed
 };
 
 class JobsCommand : public BuiltInCommand
