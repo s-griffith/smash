@@ -901,7 +901,7 @@ void ChangeDirCommand::execute()
   // If the given "path" is to go up, remove the last part of the current path
   if (string(args[1]) == "..")
   {
-    smash.setPrevDir(smash.getCurrDir());
+    smash.setPrevDir();
     goUp(smash.getCurrDir());
     deleteArgs(args);
     return;
@@ -910,13 +910,13 @@ void ChangeDirCommand::execute()
 
   if (checkFullPath(smash.getCurrDir(), args[1]))
   {
-    smash.setPrevDir(smash.getCurrDir());
+    smash.setPrevDir();
     smash.setCurrDir(args[1]);
   }
   // If not, append the new folder to the end of the current path
   else
   {
-    smash.setPrevDir(smash.getCurrDir());
+    smash.setPrevDir();
     // Figure out how to move the string into a char without allocating memory here and not being able to delete it
     smash.setCurrDir(smash.getCurrDir(), args[1]);
   }
