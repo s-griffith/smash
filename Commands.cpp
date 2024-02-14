@@ -350,13 +350,11 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
-  string cmd_s = _trim(string(cmd_line_clean));
-  string firstWord = cmd_s.substr(0, cmd_s.find_first_of(" \n"));
-  delete cmd;
-  if (firstWord.compare("quit") == 0) {
+  if (dynamic_cast<QuitCommand*>(cmd) != nullptr) {
+    delete cmd;
     exit(0);
   }
-  // Please note that you must fork smash process for some commands (e.g., external commands....)
+    delete cmd;// Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
 std::string SmallShell::getPrompt() const
