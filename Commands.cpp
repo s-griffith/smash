@@ -118,7 +118,7 @@ char **getArgs(const char *cmd_line, int *numArgs)
   char **args = (char **)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char *));
   if (args == nullptr)
   {
-    perror("smash error: malloc failed");
+    cerr << "smash error: malloc failed" << endl;
     free(args);
     return nullptr;
   }
@@ -205,7 +205,7 @@ void Command::firstUpdateCurrDir()
   if (!buffer)
   {
     free(buffer);
-    perror("smash error: malloc failed");
+    cerr << "smash error: malloc failed" << endl;
     return;
   }
   buffer = getcwd(buffer, MAX_PATH_LENGTH);
@@ -701,10 +701,10 @@ void RedirectionCommand::execute()
       }
       break;
     }
-    else if (strcmp(">", args[i]) == 0)
+    else if (over != nullptr && strcmp(">", args[i]) == 0)
     {
       *over = '\0';
-      if (over != nullptr && close(1) == SYS_FAIL)
+      if (close(1) == SYS_FAIL)
       {
         perror("smash error: close failed");
         deleteArgs(args);
@@ -723,40 +723,13 @@ void RedirectionCommand::execute()
   deleteArgs(args);
   exit(0);
 }
-// else if (over != nullptr)
-// {
-//   for (int i = 0; i < COMMAND_MAX_ARGS; i++)
-//   {
-//     if (strcmp(">", args[i]) == 0)
-//     {
-//       *over = '\0';
-//       if (close(1) == SYS_FAIL) {
-//         perror("smash error: close failed");
-//         deleteArgs(args);
-//         exit(0);
-//       }
-//       if (open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777) == SYS_FAIL) {
-//         perror("smash error: open failed");
-//         deleteArgs(args);
-//         exit(0);
-//       }
-//       smash.executeCommand(cmd);
-//       deleteArgs(args);
-//       exit(0);
-//     }
-//   }
-// }
 
-
-//-------------------------------------Pipe-------------------------------------
+//--------------------------------------------------------Pipe----------------------------------------------------------
 
 PipeCommand::PipeCommand(const char *cmd_line) : Command(cmd_line) {}
 
 void PipeCommand::execute()
 {
-
-  // char cmd1[COMMAND_ARGS_MAX_LENGTH];
-  // char cmd2[COMMAND_ARGS_MAX_LENGTH];
   string str1 = string(this->m_cmd_line);
   int pipeIndex = str1.find('|');
   int isAmpersand = 0;
@@ -772,9 +745,13 @@ void PipeCommand::execute()
   char **args2 = getArgs(sec.c_str(), &numArgs2);
   int my_pipe[2];
   pipe(my_pipe);
-  if (fork() == 0)
-  { // son
-    setpgrp();
+  if (fork() == 0) // Child
+  {
+    if (setpgrp() == SYS_FAIL)
+    {
+      perror("smash error: setpgrp failed");
+      return;
+    }
     if (!isAmpersand)
     {
       if (dup2(my_pipe[1], STDOUT_FILENO) == -1)
@@ -798,11 +775,13 @@ void PipeCommand::execute()
     close(my_pipe[0]);
     close(my_pipe[1]);
     string command = string(args1[0]);
-    execvp(command.c_str(), args1);
-    perror("smash error: evecvp failed");
-    deleteArgs(args1);
-    deleteArgs(args2);
-    exit(0);
+    if (execvp(command.c_str(), args1) == SYS_FAIL)
+    {
+      perror("smash error: evecvp failed");
+      deleteArgs(args1);
+      deleteArgs(args2);
+      exit(0);
+    }
   }
   else
   {
@@ -814,15 +793,17 @@ void PipeCommand::execute()
     close(my_pipe[0]);
     close(my_pipe[1]);
     string command = string(args2[0]);
-    execvp(command.c_str(), args2);
-    perror("smash error: evecvp failed");
-    deleteArgs(args1);
-    deleteArgs(args2);
-    exit(0);
+    if (execvp(command.c_str(), args2) == SYS_FAIL)
+    {
+      perror("smash error: evecvp failed");
+      deleteArgs(args1);
+      deleteArgs(args2);
+      exit(0);
+    }
   }
 }
 
-//-------------------------------------Chmod-------------------------------------
+//------------------------------------------------Chmod----------------------------------------------------------------
 
 ChmodCommand::ChmodCommand(const char *cmd_line) : BuiltInCommand(cmd_line) {}
 
@@ -850,10 +831,11 @@ void ChmodCommand::execute()
     deleteArgs(args);
     return;
   }
-  if (chmod(args[2], permissionsNum) != 0)
+  if (chmod(args[2], permissionsNum) == SYS_FAIL)
   {
     deleteArgs(args);
     perror("smash error: chmod failed");
+    return;
   }
   deleteArgs(args);
 }
@@ -865,8 +847,20 @@ pid_t SmallShell::m_pid = getpid();
 SmallShell::SmallShell(std::string prompt) : m_pid_fg(0), m_prompt(prompt)
 {
   m_prevDir = (char *)malloc((MAX_PATH_LENGTH + 1) * sizeof(char));
+  if (m_prevDir == nullptr)
+  {
+    free(m_prevDir);
+    cerr << "smash error: malloc failed" << endl;
+    return;
+  }
   strcpy(m_prevDir, "");
   m_currDir = (char *)malloc((MAX_PATH_LENGTH + 1) * sizeof(char));
+  if (m_currDir == nullptr)
+  {
+    free(m_currDir);
+    cerr << "smash error: malloc failed" << endl;
+    return;
+  }
   strcpy(m_currDir, "");
 }
 
@@ -907,7 +901,11 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     }
     else
     {
-      setpgrp();
+      if (setpgrp() == SYS_FAIL)
+      {
+        perror("smash error: setpgrp failed");
+        return nullptr;
+      }
       return new RedirectionCommand(cmd_line);
     }
   }
@@ -923,7 +921,12 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   if (strchr(cmd, '|'))
   {
     pid_t pid = fork();
-    if (pid > 0)
+    if (pid < 0)
+    {
+      perror("smash error: fork failed");
+      return nullptr;
+    }
+    else if (pid > 0)
     {
       int status;
       shell.m_pid_fg = pid;
@@ -938,7 +941,11 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     }
     else
     {
-      setpgrp();
+      if (setpgrp() == SYS_FAIL)
+      {
+        perror("smash error: setpgrp failed");
+        return nullptr;
+      }
       return new PipeCommand(cmd_line);
     }
   }
@@ -978,7 +985,6 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
   {
     return new ChmodCommand(cmd_line);
   }
-  // others
   else
   {
     bool isBackground = _isBackgroundComamnd(cmd_line);
@@ -1003,7 +1009,11 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     }
     if (pid == 0)
     {
-      setpgrp();
+      if (setpgrp() == SYS_FAIL)
+      {
+        perror("smash error: setpgrp failed");
+        return nullptr;
+      }
       return new ExternalCommand(cmd_line);
     }
     else if (pid > 0 && isBackground)
@@ -1022,8 +1032,6 @@ JobsList *SmallShell::getJobs()
 
 void SmallShell::executeCommand(const char *cmd_line)
 {
-  // TODO: Add your implementation here
-  // for example:
   Command *cmd = CreateCommand(cmd_line);
   if (cmd == nullptr)
   {
@@ -1036,7 +1044,7 @@ void SmallShell::executeCommand(const char *cmd_line)
     delete cmd;
     exit(0);
   }
-  delete cmd; // Please note that you must fork smash process for some commands (e.g., external commands....)
+  delete cmd;
 }
 
 void SmallShell::chngPrompt(const std::string newPrompt)
