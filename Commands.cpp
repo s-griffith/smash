@@ -825,7 +825,7 @@ void ChmodCommand::execute()
     return;
   }
   permissionsNum = stoi(args[1], nullptr, 8);
-  if ((permissionsNum < 0 || permissionsNum > 777) && !(permissionsNum < 4777 && permissionsNum > 4000))
+  if ((permissionsNum < 0 || permissionsNum > 0777) && !(permissionsNum <= 04777 && permissionsNum >= 04000))
   {
     cerr << "smash error: chmod: invalid arguments" << endl;
     deleteArgs(args);
