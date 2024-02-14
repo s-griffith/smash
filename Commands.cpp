@@ -463,15 +463,6 @@ void ChangeDirCommand::execute()
   // If not, append the new folder to the end of the current path
   else
   {
-    if (string(smash.getCurrDir()) == "/") {
-      smash.setPrevDir();
-      char newPath[MAX_PATH_LENGTH + 2];
-      newPath[0] = '/';
-      newPath[1] = *args[1];
-      smash.setCurrDir(newPath);
-      deleteArgs(args);
-      return;
-    }
     smash.setPrevDir();
     smash.setCurrDir(smash.getCurrDir(), args[1]);
   }
@@ -1087,7 +1078,9 @@ void SmallShell::setCurrDir(char *currDir, char *toCombine)
     return;
   }
   strcpy(temp, currDir);
-  strcat(temp, "/");
+  if (strcmp(currDir, '/') != 0) {
+    strcat(temp, "/");
+  }
   strcat(temp, toCombine);
   strcpy(m_currDir, temp);
   free(temp);
