@@ -397,9 +397,9 @@ char *SmallShell::getPrevDir() const
 {
   return m_prevDir;
 }
-void SmallShell::setPrevDir(char *prevDir)
+void SmallShell::setPrevDir()
 {
-  strcpy(m_prevDir, prevDir);
+  strcpy(m_prevDir, m_currDir);
 }
 
 //-------------------------------------Pipe-------------------------------------
@@ -886,10 +886,9 @@ void ChangeDirCommand::execute()
     }
     // switch current and previous directories
     char temp[MAX_PATH_LENGTH + 1];
-    strcpy(temp, smash.getCurrDir());
-    // char* temp = smash.getCurrDir();
-    smash.setCurrDir(smash.getPrevDir());
-    smash.setPrevDir(temp);
+    strcpy(temp, smash.getPrevDir());
+    smash.setPrevDir();
+    smash.setCurrDir(temp);
     deleteArgs(args);
     return;
   }

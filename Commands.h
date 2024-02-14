@@ -721,7 +721,7 @@ public:
    * @return
    *      char*  - the current directory
    */
-  void setPrevDir(char *prevDir);
+  void setPrevDir();
 
   /*
    * The internal fields associated with SmallShell:
