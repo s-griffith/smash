@@ -758,8 +758,8 @@ void PipeCommand::execute()
       {
         deleteArgs(args1);
         deleteArgs(args2);
-        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
-        return;
+        perror("smash error: dup2 failed");
+        exit(0);
       }
     }
     else
@@ -768,8 +768,8 @@ void PipeCommand::execute()
       {
         deleteArgs(args1);
         deleteArgs(args2);
-        std::cerr << "Failed to redirect stdout to pipe." << std::endl;
-        return;
+        perror("smash error: dup2 failed");
+        exit(0);
       }
     }
     close(my_pipe[0]);
@@ -785,10 +785,10 @@ void PipeCommand::execute()
   }
   else
   {
-    if (dup2(my_pipe[0], STDIN_FILENO) == -1)
+    if (dup2(my_pipe[0], STDIN_FILENO) == SYS_FAIL)
     {
-      // std::cerr << "Failed to redirect stdout to pipe." << std::endl;
-      return;
+      perror("smash error: dup2 failed");
+      exit(0);
     }
     close(my_pipe[0]);
     close(my_pipe[1]);
