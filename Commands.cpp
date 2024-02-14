@@ -12,6 +12,7 @@
 using namespace std;
 
 const std::string WHITESPACE = " \n\r\t\f\v";
+const int SYS_FAIL = -1;
 
 #if 0
 #define FUNC_ENTRY() \
@@ -22,7 +23,6 @@ const std::string WHITESPACE = " \n\r\t\f\v";
 #else
 #define FUNC_ENTRY()
 #define FUNC_EXIT()
-#define SYS_FAIL -1
 #endif
 
 string _ltrim(const std::string &s)
@@ -64,7 +64,6 @@ int _parseCommandLine(const char *cmd_line, char **args)
     memset(args[i], 0, s.length() + 1);
     strcpy(args[i], s.c_str());
     args[++i] = NULL;
-    // CHECK IF MALLOC FAILED IF SO PERROR
   }
   return i;
 
@@ -98,8 +97,7 @@ void _removeBackgroundSign(char *cmd_line)
   cmd_line[str.find_last_not_of(WHITESPACE, idx) + 1] = 0;
 }
 
-
-//-------------------------------------Helper Functions-------------------------------------
+//-----------------------------------------------Helper Functions-------------------------------------------------------
 
 /*
  * Parses/Extracts each individual argument and command
@@ -191,8 +189,7 @@ bool is_number(const std::string &s)
   return !s.empty() && it == s.end();
 }
 
-
-//-------------------------------------Command-------------------------------------
+//-----------------------------------------------Command-----------------------------------------------
 
 Command::Command(const char *cmd_line) : m_cmd_line(cmd_line) {}
 
@@ -209,32 +206,33 @@ void Command::firstUpdateCurrDir()
   {
     free(buffer);
     perror("smash error: malloc failed");
+    return;
   }
   buffer = getcwd(buffer, MAX_PATH_LENGTH);
   if (!buffer)
   {
     free(buffer);
     perror("smash error: getcwd failed");
+    return;
   }
   smash.setCurrDir(buffer);
   free(buffer);
 }
 
-
-//-------------------------------------BuiltInCommand-------------------------------------
+//-----------------------------------------------BuiltInCommand-----------------------------------------------
 
 BuiltInCommand::BuiltInCommand(const char *cmd_line) : Command::Command(cmd_line) {}
 
-
-//-------------------------------------Jobs-------------------------------------
-JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped) : m_id(id), m_pid(pid), m_isStopped(isStopped)
+//-----------------------------------------------Jobs-----------------------------------------------
+JobsList::JobEntry::JobEntry(int id, pid_t pid, const char *cmd, bool isStopped) : m_id(id), m_pid(pid),
+                                                                                   m_isStopped(isStopped)
 {
   strcpy(m_cmd, cmd);
 }
 
 void JobsList::addJob(const char *cmd, pid_t pid, bool isStopped)
 {
-  removeFinishedJobs(); // think on a better way to update maxId!!!!
+  removeFinishedJobs();
   JobEntry newJob(max_id + 1, pid, cmd, isStopped);
   this->m_list.push_back(newJob);
   max_id++;
@@ -246,7 +244,6 @@ void JobsList::printJobsList()
   int i = 1;
   for (JobEntry job : m_list)
   {
-    // element.job.second
     std::cout << "[" << job.m_id << "] " << job.m_cmd << endl;
     i++;
   }
@@ -258,8 +255,11 @@ void JobsList::killAllJobs()
   cout << "smash: sending SIGKILL signal to " << m_list.size() << " jobs:" << endl;
   for (JobEntry element : m_list)
   {
-    cout << element.m_pid << ": " << element.m_cmd << endl; // remove space
-    kill(element.m_pid, SIGKILL);
+    cout << element.m_pid << ": " << element.m_cmd << endl;
+    if (kill(element.m_pid, SIGKILL) == SYS_FAIL)
+    {
+      perror("smash error: kill failed");
+    }
   }
 }
 
@@ -350,7 +350,6 @@ void JobsList::removeFinishedJobs()
   max_id = max;
 }
 
-
 //-------------------------------------Built-In Commands-------------------------------------
 //-------------------------------------ChangePromptCommand-------------------------------------
 
@@ -374,7 +373,6 @@ void ChangePromptCommand::execute()
   deleteArgs(args);
 }
 
-
 //-------------------------------------ShowPidCommand-------------------------------------
 
 ShowPidCommand::ShowPidCommand(const char *cmd_line) : BuiltInCommand(cmd_line) {}
@@ -384,7 +382,6 @@ void ShowPidCommand::execute()
   SmallShell &smash = SmallShell::getInstance();
   cout << "smash pid is " << smash.m_pid << endl;
 }
-
 
 //-------------------------------------GetCurrDirCommand-------------------------------------
 
@@ -400,10 +397,10 @@ void GetCurrDirCommand::execute()
   cout << string(smash.getCurrDir()) << endl;
 }
 
-
 //-------------------------------------ChangeDirCommand-------------------------------------
 
-ChangeDirCommand::ChangeDirCommand(const char *cmd_line, char **plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
+ChangeDirCommand::ChangeDirCommand(const char *cmd_line, char **plastPwd) : BuiltInCommand(cmd_line),
+                                                                            m_plastPwd(plastPwd) {}
 
 void ChangeDirCommand::execute()
 {
@@ -414,8 +411,8 @@ void ChangeDirCommand::execute()
   }
   int numArgs = 0;
   char **args = getArgs(this->m_cmd_line, &numArgs);
-  if (numArgs > 2)
-  { // the command itself counts as an arg
+  if (numArgs > 2) // The command itself counts as an arg
+  {
     cerr << "smash error: cd: too many arguments" << endl;
     deleteArgs(args);
     return;
@@ -428,13 +425,13 @@ void ChangeDirCommand::execute()
   }
   else if (string(args[1]) == "-")
   {
-    if (chdir(*m_plastPwd) != 0)
+    if (chdir(*m_plastPwd) == SYS_FAIL)
     {
       perror("smash error: chdir failed");
       deleteArgs(args);
       return;
     }
-    // switch current and previous directories
+    // Switch current and previous directories
     char temp[MAX_PATH_LENGTH + 1];
     strcpy(temp, smash.getPrevDir());
     smash.setPrevDir();
@@ -442,7 +439,7 @@ void ChangeDirCommand::execute()
     deleteArgs(args);
     return;
   }
-  if (chdir(args[1]) != 0)
+  if (chdir(args[1]) == SYS_FAIL)
   {
     perror("smash error: chdir failed");
     deleteArgs(args);
@@ -456,8 +453,8 @@ void ChangeDirCommand::execute()
     deleteArgs(args);
     return;
   }
-  // If the new path is the full path, set currDir equal to it
 
+  // If the new path is the full path, set currDir equal to it
   if (checkFullPath(args[1]))
   {
     smash.setPrevDir();
@@ -472,7 +469,6 @@ void ChangeDirCommand::execute()
   deleteArgs(args);
 }
 
-
 //-------------------------------------JobsCommand-------------------------------------
 
 JobsCommand::JobsCommand(const char *cmd_line) : BuiltInCommand(cmd_line) {}
@@ -482,7 +478,6 @@ void JobsCommand::execute()
   SmallShell &smash = SmallShell::getInstance();
   smash.getJobs()->printJobsList();
 }
-
 
 //-------------------------------------Foreground-------------------------------------
 
@@ -505,7 +500,6 @@ void ForegroundCommand::execute()
       job_id = m_jobs->getMaxId();
     }
   }
-
   else if (!is_number(args[1]))
   {
     cerr << "smash error: fg: invalid arguments" << endl;
@@ -516,6 +510,7 @@ void ForegroundCommand::execute()
   {
     job_id = stoi(args[1]);
   }
+
   JobsList::JobEntry *job = m_jobs->getJobById(job_id);
   if (!job)
   {
@@ -535,6 +530,7 @@ void ForegroundCommand::execute()
     deleteArgs(args);
     return;
   }
+
   SmallShell &smash = SmallShell::getInstance();
   if (job_id >= 0 && job)
   {
@@ -545,12 +541,9 @@ void ForegroundCommand::execute()
       {
         perror("smash error: kill failed");
         deleteArgs(args);
-        // free_args(args, num_of_args);
-        /// TODO: check free
         return;
       }
     }
-
     int status;
     cout << job->m_cmd << " " << job_pid << endl;
     smash.m_pid_fg = job_pid;
@@ -559,14 +552,12 @@ void ForegroundCommand::execute()
     {
       perror("smash error: waitpid failed");
       deleteArgs(args);
-      // free_args(args, num_of_args);
       return;
     }
     smash.m_pid_fg = 0;
   }
   deleteArgs(args);
 }
-
 
 //-------------------------------------QuitCommand-------------------------------------
 
@@ -582,7 +573,6 @@ void QuitCommand::execute()
   }
   deleteArgs(args);
 }
-
 
 //-------------------------------------Kill-------------------------------------
 
@@ -617,7 +607,6 @@ void KillCommand::execute()
     }
 
     // Check for a valid signal number
-
     char first_char = string(args[1]).at(0);
     char minus = '-';
     if (first_char != minus)
@@ -643,7 +632,6 @@ void KillCommand::execute()
   m_jobs->sigJobById(job_id, signum);
   deleteArgs(args);
 }
-
 
 //-------------------------------------ExternalCommand-------------------------------------
 
@@ -676,13 +664,11 @@ void ExternalCommand::execute()
       deleteArgs(args);
       exit(0);
     }
-    free(args);
+    deleteArgs(args);
   }
 }
 
-
 //-------------------------------------Special Commands-------------------------------------
-
 //-------------------------------------Redirection Command-------------------------------------
 
 RedirectionCommand::RedirectionCommand(const char *cmd_line) : Command(cmd_line) {}
@@ -696,38 +682,71 @@ void RedirectionCommand::execute()
   strcpy(cmd, this->m_cmd_line);
   char *over = strstr(cmd, ">");
   char *app = strstr(cmd, ">>");
-  if (app != nullptr)
+  for (int i = 0; i < COMMAND_MAX_ARGS; i++)
   {
-    for (int i = 0; i < COMMAND_MAX_ARGS; i++)
+    if (app != nullptr && strcmp(">>", args[i]) == 0)
     {
-      if (strcmp(">>", args[i]) == 0)
+      *app = '\0';
+      if (close(1) == SYS_FAIL)
       {
-        *app = '\0';
-        close(1);
-        open(args[i + 1], O_WRONLY | O_APPEND | O_CREAT, 0777);
-        smash.executeCommand(cmd);
+        perror("smash error: close failed");
         deleteArgs(args);
         exit(0);
       }
-    }
-  }
-  else if (over != nullptr)
-  {
-    for (int i = 0; i < COMMAND_MAX_ARGS; i++)
-    {
-      if (strcmp(">", args[i]) == 0)
+      if (open(args[i + 1], O_WRONLY | O_APPEND | O_CREAT, 0777) == SYS_FAIL)
       {
-        *over = '\0';
-        close(1);
-        open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-        smash.executeCommand(cmd);
+        perror("smash error: open failed");
         deleteArgs(args);
         exit(0);
       }
+      break;
+    }
+    else if (strcmp(">", args[i]) == 0)
+    {
+      *over = '\0';
+      if (over != nullptr && close(1) == SYS_FAIL)
+      {
+        perror("smash error: close failed");
+        deleteArgs(args);
+        exit(0);
+      }
+      if (open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777) == SYS_FAIL)
+      {
+        perror("smash error: open failed");
+        deleteArgs(args);
+        exit(0);
+      }
+      break;
     }
   }
+  smash.executeCommand(cmd);
+  deleteArgs(args);
+  exit(0);
 }
-
+// else if (over != nullptr)
+// {
+//   for (int i = 0; i < COMMAND_MAX_ARGS; i++)
+//   {
+//     if (strcmp(">", args[i]) == 0)
+//     {
+//       *over = '\0';
+//       if (close(1) == SYS_FAIL) {
+//         perror("smash error: close failed");
+//         deleteArgs(args);
+//         exit(0);
+//       }
+//       if (open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777) == SYS_FAIL) {
+//         perror("smash error: open failed");
+//         deleteArgs(args);
+//         exit(0);
+//       }
+//       smash.executeCommand(cmd);
+//       deleteArgs(args);
+//       exit(0);
+//     }
+//   }
+// }
+}
 
 //-------------------------------------Pipe-------------------------------------
 
@@ -803,7 +822,6 @@ void PipeCommand::execute()
   }
 }
 
-
 //-------------------------------------Chmod-------------------------------------
 
 ChmodCommand::ChmodCommand(const char *cmd_line) : BuiltInCommand(cmd_line) {}
@@ -839,7 +857,6 @@ void ChmodCommand::execute()
   }
   deleteArgs(args);
 }
-
 
 //-------------------------------------SmallShell-------------------------------------
 
@@ -880,6 +897,11 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     {
       shell.m_pid_fg = pid;
       pid = waitpid(pid, &stat, WUNTRACED);
+      if (pid == SYS_FAIL)
+      {
+        perror("smash error: waitpid failed");
+        return nullptr;
+      }
       shell.m_pid_fg = 0;
       return nullptr;
     }
@@ -906,6 +928,11 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
       int status;
       shell.m_pid_fg = pid;
       pid = waitpid(pid, &status, WUNTRACED);
+      if (pid == SYS_FAIL)
+      {
+        perror("smash error: waitpid failed");
+        return nullptr;
+      }
       shell.m_pid_fg = 0;
       return nullptr;
     }
@@ -966,6 +993,11 @@ Command *SmallShell::CreateCommand(const char *cmd_line)
     {
       shell.m_pid_fg = pid;
       pid = waitpid(pid, &stat, WUNTRACED);
+      if (pid == SYS_FAIL)
+      {
+        perror("smash error: waitpid failed");
+        return nullptr;
+      }
       shell.m_pid_fg = 0;
       return nullptr;
     }
