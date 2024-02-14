@@ -334,7 +334,7 @@ private:
  */
 class JobsList
 {
-private:
+public:
   /*
    *  JobEntry Class:
    *  This class represents a job in the list of jobs in SmallShell.
