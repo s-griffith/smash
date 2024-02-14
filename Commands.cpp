@@ -466,7 +466,7 @@ void ChangeDirCommand::execute()
     if (string(smash.getCurrDir()) == "/") {
       smash.setPrevDir();
       char newPath[MAX_PATH_LENGTH + 2];
-      newPath[0] = "/"
+      newPath[0] = '/';
       newPath[1] = args[1];
       smash.setCurrDir(newPath);
       deleteArgs(args);
