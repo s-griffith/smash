@@ -157,19 +157,19 @@ bool checkFullPath(char *currPath, char *newPath)
 {
   if (newPath[0] == '/')
     return true;
-  int i = 0;
-  int minLen = min(string(currPath).length(), string(newPath).length());
-  for (; i < minLen; i++)
-  {
-    if (currPath[i] != newPath[i])
-    {
-      break;
-    }
-  }
-  if (i > 1)
-  {
-    return true;
-  }
+  // int i = 0;
+  // int minLen = min(string(currPath).length(), string(newPath).length());
+  // for (; i < minLen; i++)
+  // {
+  //   if (currPath[i] != newPath[i])
+  //   {
+  //     break;
+  //   }
+  // }
+  // if (i > 1)
+  // {
+  //   return true;
+  // }
   return false;
 }
 
