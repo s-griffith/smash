@@ -53,7 +53,6 @@ protected:
   const char *m_cmd_line;
 };
 
-
 /*
  *  BuiltInCommand Class:
  *  This class represents a built-in Command of SmallShell.
@@ -74,7 +73,6 @@ public:
    */
   virtual ~BuiltInCommand() = default;
 };
-
 
 //-------------------------------------Jobs List-------------------------------------
 
@@ -227,7 +225,6 @@ private:
   int max_id = 0;
 };
 
-
 //-------------------------------------Built-In Commands-------------------------------------
 
 /*
@@ -260,7 +257,6 @@ public:
   void execute() override;
 };
 
-
 /*
  *  ShowPidCommand Class:
  *  This class represents a showpid Command of SmallShell.
@@ -291,7 +287,6 @@ public:
   void execute() override;
 };
 
-
 /*
  *  GetCurrDirCommand Class:
  *  This class represents a pwd Command of SmallShell.
@@ -321,7 +316,6 @@ public:
    */
   void execute() override;
 };
-
 
 /*
  *  ChangeDirCommand Class:
@@ -361,7 +355,6 @@ private:
   char **m_plastPwd;
 };
 
-
 /*
  *  JobsCommand Class:
  *  This class represents the jobs Command in SmallShell.
@@ -391,7 +384,6 @@ public:
    */
   void execute() override;
 };
-
 
 /*
  *  ForegroundCommand Class:
@@ -431,7 +423,6 @@ private:
   JobsList *m_jobs;
 };
 
-
 /*
  *  QuitCommand Class:
  *  This class represents a quit Command of SmallShell.
@@ -469,7 +460,6 @@ private:
    */
   JobsList *m_jobs;
 };
-
 
 /*
  *  KillCommand Class:
@@ -509,7 +499,6 @@ private:
   JobsList *m_jobs;
 };
 
-
 //-------------------------------------External Commands-------------------------------------
 
 /*
@@ -541,7 +530,6 @@ public:
    */
   void execute() override;
 };
-
 
 //-------------------------------------Special Commands-------------------------------------
 
@@ -575,7 +563,6 @@ public:
   void execute() override;
 };
 
-
 /*
  *  PipeCommand Class:
  *  This class represents a pipe Command of SmallShell.
@@ -606,7 +593,6 @@ public:
   void execute() override;
 };
 
-
 /*
  *  ChmodCommand Class:
  *  This class represents the chmod Command in SmallShell.
@@ -636,7 +622,6 @@ public:
    */
   void execute() override;
 };
-
 
 //-------------------------------------SmallShell-------------------------------------
 
@@ -761,6 +746,7 @@ public:
    */
   static pid_t m_pid;
   int m_pid_fg;
+
 private:
   std::string m_prompt;
   char *m_prevDir;
