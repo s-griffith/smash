@@ -177,6 +177,14 @@ public:
   JobEntry *getJobById(int jobId);
 
   /*
+   * Removes a job from the jobs list according to its ID
+   * @param jobId - The job's ID
+   * @return
+   *    void
+   */
+  void removeJobById(int jobId);
+
+  /*
    * Handles signals sent to a specific job
    * @param jobId - The job's ID
    * @param signum - The signal number sent
@@ -184,14 +192,6 @@ public:
    *    void
    */
   void sigJobById(int jobId, int signum);
-
-  /*
-   * Removes a job from the jobs list according to its ID
-   * @param jobId - The job's ID
-   * @return
-   *    void
-   */
-  void removeJobById(int jobId);
 
   /*
    * Determines whether the list of jobs is empty
