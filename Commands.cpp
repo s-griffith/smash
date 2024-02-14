@@ -346,6 +346,7 @@ void SmallShell::executeCommand(const char *cmd_line)
   Command *cmd = CreateCommand(cmd_line);
   if (cmd == nullptr)
   {
+    delete cmd;
     return;
   }
   cmd->execute();
@@ -711,7 +712,6 @@ void ForegroundCommand::execute()
       return;
     }
     smash.m_pid_fg = 0;
-    deleteArgs(args);
   }
   deleteArgs(args);
 }
