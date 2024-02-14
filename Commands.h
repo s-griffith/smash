@@ -337,6 +337,23 @@ class JobsList
 public:
 
   /*
+   *  JobEntry Class:
+   *  This class represents a job in the list of jobs in SmallShell.
+   */
+  class JobEntry
+  {
+  public:
+    int m_id;
+    pid_t m_pid;
+    char m_cmd[COMMAND_ARGS_MAX_LENGTH + 1];
+    bool m_isStopped;
+    JobEntry() {}
+    JobEntry(int id, pid_t pid, const char *cmd, bool isStopped = false);
+    ~JobEntry() = default;
+  };
+
+
+  /*
    * Constructor of JobsList class
    * Receives no parameters.
    * @return
@@ -415,22 +432,6 @@ public:
    *    int - the current largest used ID in the jobs list
    */
   int getMaxId();
-
-  /*
-   *  JobEntry Class:
-   *  This class represents a job in the list of jobs in SmallShell.
-   */
-  class JobEntry
-  {
-  public:
-    int m_id;
-    pid_t m_pid;
-    char m_cmd[COMMAND_ARGS_MAX_LENGTH + 1];
-    bool m_isStopped;
-    JobEntry() {}
-    JobEntry(int id, pid_t pid, const char *cmd, bool isStopped = false);
-    ~JobEntry() = default;
-  };
 
 private:
 
