@@ -733,7 +733,7 @@ public:
    * jobs: The list of jobs in SmallShell
    */
   static pid_t m_pid;
-  int m_pid_fg = 0;
+  int m_pid_fg;
 private:
   std::string m_prompt;
   char *m_prevDir;
