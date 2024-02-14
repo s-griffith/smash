@@ -335,7 +335,6 @@ private:
 class JobsList
 {
 public:
-
   /*
    *  JobEntry Class:
    *  This class represents a job in the list of jobs in SmallShell.
@@ -343,15 +342,42 @@ public:
   class JobEntry
   {
   public:
+    /*
+     * Constructor of JobEntry class
+     * Receives no parameters.
+     * @return
+     *      A new instance of JobEntry.
+     */
+    JobEntry() {}
+
+    /*
+     * Constructor of JobEntry class
+     * @param id - the given job's ID
+     * @param pid - the job's PID
+     * @param cmd - the given CMD line
+     * @param isStopped - whether the job has been stopped
+     * @return
+     *      A new instance of JobEntry.
+     */
+    JobEntry(int id, pid_t pid, const char *cmd, bool isStopped = false);
+
+    /*
+     * Destructor of the JobEntry class
+     */
+    ~JobEntry() = default;
+
+    /*
+     * The internal fields associated with JobEntry:
+     * m_id: The job's ID
+     * m_pid: The job's PID
+     * m_cmd: The job's CMD line
+     * m_isStopped: Whether the job has been stopped
+     */
     int m_id;
     pid_t m_pid;
     char m_cmd[COMMAND_ARGS_MAX_LENGTH + 1];
     bool m_isStopped;
-    JobEntry() {}
-    JobEntry(int id, pid_t pid, const char *cmd, bool isStopped = false);
-    ~JobEntry() = default;
   };
-
 
   /*
    * Constructor of JobsList class
@@ -371,7 +397,7 @@ public:
    * @param cmd - The CMD command received
    * @param pid - The PID of the job to be added
    * @param isStopped - Whether the job has been stopped
-   * @return 
+   * @return
    *    void
    */
   void addJob(const char *cmd, pid_t pid, bool isStopped = false);
@@ -379,7 +405,7 @@ public:
   /*
    * Prints the list of jobs
    * Receives no parameters.
-   * @return 
+   * @return
    *    void
    */
   void printJobsList();
@@ -387,7 +413,7 @@ public:
   /*
    * Kills all jobs in the jobs list
    * Receives no parameters.
-   * @return 
+   * @return
    *    void
    */
   void killAllJobs();
@@ -395,7 +421,7 @@ public:
   /*
    * Retrieves a specific job according to its ID
    * @param jobId - The job's ID
-   * @return 
+   * @return
    *    JobEntry* - A pointer to the requested job
    */
   JobEntry *getJobById(int jobId);
@@ -404,7 +430,7 @@ public:
    * Handles signals sent to a specific job
    * @param jobId - The job's ID
    * @param signum - The signal number sent
-   * @return 
+   * @return
    *    void
    */
   void sigJobById(int jobId, int signum);
@@ -412,7 +438,7 @@ public:
   /*
    * Removes a job from the jobs list according to its ID
    * @param jobId - The job's ID
-   * @return 
+   * @return
    *    void
    */
   void removeJobById(int jobId);
@@ -420,7 +446,7 @@ public:
   /*
    * Determines whether the list of jobs is empty
    * Receives no parameters.
-   * @return 
+   * @return
    *    bool - whether the jobs list is empty
    */
   bool isEmpty();
@@ -428,102 +454,291 @@ public:
   /*
    * Returns the current largest used ID in the jobs list
    * Receives no parameters.
-   * @return 
+   * @return
    *    int - the current largest used ID in the jobs list
    */
   int getMaxId();
 
 private:
-
   /*
    * Removes finished jobs from the list of jobs
    * Receives no parameters.
-   * @return 
+   * @return
    *    void
    */
   void removeFinishedJobs();
 
-
+  /*
+   * The internal fields associated with JobsList:
+   * m_list: The list of jobs in SmallShell
+   * max_id: The largest used jobs ID in the list
+   */
   std::vector<JobEntry> m_list;
   int max_id = 0;
 };
 
+/*
+ *  JobsCommand Class:
+ *  This class represents the jobs Command in SmallShell.
+ */
 class JobsCommand : public BuiltInCommand
 {
-  // TODO: Add your data members
 public:
+  /*
+   * Constructor of JobsCommand class
+   * @param cmd_line - The CMD line received
+   * @return
+   *      A new instance of JobsCommand.
+   */
   JobsCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the JobsCommand class
+   */
   virtual ~JobsCommand() {}
+
+  /*
+   * Execute function of the JobsCommand class:
+   * Executes the jobs command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+/*
+ *  KillCommand Class:
+ *  This class represents the kill Command in SmallShell.
+ */
 class KillCommand : public BuiltInCommand
 {
-  JobsList *m_jobs;
-  // TODO: Add your data members
 public:
+  /*
+   * Constructor of KillCommand class
+   * @param cmd_line - The CMD line received
+   * @param jobs - The list of jobs in SmallShell
+   * @return
+   *      A new instance of KillCommand.
+   */
   KillCommand(const char *cmd_line, JobsList *jobs);
+
+  /*
+   * Destructor of the KillCommand class
+   */
   virtual ~KillCommand() {}
+
+  /*
+   * Execute function of the KillCommand class:
+   * Executes the kill command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
+
+private:
+  /*
+   * The internal field associated with KillCommand:
+   * m_jobs: The list of jobs in SmallShell
+   */
+  JobsList *m_jobs;
 };
 
+/*
+ *  ForegroundCommand Class:
+ *  This class represents the fg Command in SmallShell.
+ */
 class ForegroundCommand : public BuiltInCommand
 {
-  // TODO: Add your data members
-  JobsList *m_jobs;
-
 public:
+  /*
+   * Constructor of ForegroundCommand class
+   * @param cmd_line - The CMD line received
+   * @param jobs - The list of jobs in SmallShell
+   * @return
+   *      A new instance of Foreground.
+   */
   ForegroundCommand(const char *cmd_line, JobsList *jobs);
+
+  /*
+   * Destructor of the ForegroundCommand class
+   */
   virtual ~ForegroundCommand() {}
+
+  /*
+   * Execute function of the ForegroundCommand class:
+   * Executes the fg command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
+
+private:
+  /*
+   * The internal field associated with ForegroundCommand:
+   * m_jobs: The list of jobs in SmallShell
+   */
+  JobsList *m_jobs;
 };
 
+/*
+ *  ChmodCommand Class:
+ *  This class represents the chmod Command in SmallShell.
+ */
 class ChmodCommand : public BuiltInCommand
 {
 public:
+  /*
+   * Constructor of ChmodCommand class
+   * @param cmd_line - The CMD line received
+   * @return
+   *      A new instance of ChmodCommand.
+   */
   ChmodCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the ChmodCommand class
+   */
   virtual ~ChmodCommand() {}
+
+  /*
+   * Execute function of the ChmodCommand class:
+   * Executes the chmod command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+/*
+ *  SmallShell Class:
+ *  This class represents the smash (small shell).
+ */
 class SmallShell
 {
+public:
+  /*
+   * Constructor of SmallShell class
+   * @param prompt - The desired prompt line
+   * @return
+   *      A new instance of SmallShell.
+   */
+  SmallShell(const std::string prompt = "smash");
+
+  /*
+   * Disable copy constructor and assignment operator
+   */
+  SmallShell(SmallShell const &) = delete;
+  void operator=(SmallShell const &) = delete;
+
+  /*
+   * Make a SmallShell singleton:
+   * It is guaranteed to be destroyed
+   * Initialized on its first use
+   */
+  static SmallShell &getInstance()
+  {
+    static SmallShell instance;
+    return instance;
+  }
+
+  /*
+   * Destructor of SmallShell class
+   */
+  ~SmallShell();
+
+  /*
+   * Creates a command based on the input received
+   * @param cmd_line - The CMD line received
+   * @return
+   *      A new instance of Command.
+   */
+  Command *CreateCommand(const char *cmd_line);
+
+  /*
+   * Retrieves the list of jobs in SmallShell
+   * Receives no parameters.
+   * @return
+   *     JobsList* - a pointer to SmallShell's list of jobs.
+   */
+  JobsList *getJobs();
+
+  /*
+   * Executes a command created
+   * @param cmd_line - The CMD line received
+   * @return
+   *      void
+   */
+  void executeCommand(const char *cmd_line);
+
+  /*
+   * Changes the prompt
+   * @param newPrompt - the desired new prompt
+   * @return
+   *      void
+   */
+  void chngPrompt(const std::string newPrompt = "smash");
+
+  /*
+   * Gets the current prompt
+   * Receives no parameters
+   * @return
+   *      string - the current prompt
+   */
+  std::string getPrompt() const;
+
+  /*
+   * Gets the current directory
+   * Receives no parameters
+   * @return
+   *      char*  - the current directory
+   */
+  char *getCurrDir() const;
+
+  /*
+   * Sets the current directory
+   * @param currDir - the new current directory
+   * @param toCombine - a partial path to add to the current path
+   * @return
+   *      void
+   */
+  void setCurrDir(char *currDir, char *toCombine = nullptr);
+
+  /*
+   * Gets the previous directory
+   * Receives no parameters
+   * @return
+   *      char*  - the previous directory
+   */
+  char *getPrevDir() const;
+
+  /*
+   * Gets the current directory
+   * @param prevDir - the new previous directory
+   * @return
+   *      char*  - the current directory
+   */
+  void setPrevDir(char *prevDir);
+
+  /*
+   * The internal fields associated with SmallShell:
+   * m_pid: SmallShell's PID
+   * m_pid_fg: The PID of a process running in the foreground
+   * m_prompt: SmallShell's prompt
+   * m_prevDir: The previous directory
+   * m_currDir: The current directory
+   * jobs: The list of jobs in SmallShell
+   */
+  static pid_t m_pid;
+  int m_pid_fg = 0;
 private:
   std::string m_prompt;
   char *m_prevDir;
-  /// TODO: MIGHT MAKE PROBLEMS LATER ON. IF DOES, GET RID OF FLAG AND RUN SYSCALL EVERY TIME FOR PWD
   char *m_currDirectory;
-
-  SmallShell(const std::string prompt = "smash");
-
   JobsList jobs;
-
-public:
-  static pid_t m_pid;
-
-  int m_pid_fg = 0;
-
-  Command *CreateCommand(const char *cmd_line);
-
-  SmallShell(SmallShell const &) = delete; // disable copy ctor
-
-  void operator=(SmallShell const &) = delete; // disable = operator
-
-  static SmallShell &getInstance() // make SmallShell singleton
-  {
-    static SmallShell instance; // Guaranteed to be destroyed.
-    // Instantiated on first use.
-    return instance;
-  }
-  ~SmallShell();
-  JobsList *getJobs();
-  void executeCommand(const char *cmd_line);
-  void chngPrompt(const std::string newPrompt = "smash");
-  std::string getPrompt() const;
-  char *getCurrDir() const;
-  void setCurrDir(char *currDir, char *toCombine = nullptr);
-  char *getPrevDir() const;
-  void setPrevDir(char *prevDir);
 };
 
 #endif // SMASH_COMMAND_H_
