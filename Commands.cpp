@@ -191,9 +191,9 @@ bool is_number(const std::string &s)
 
 //-------------------------------------SmallShell-------------------------------------
 
-//pid_t SmallShell::m_pid = getpid();
+pid_t SmallShell::m_pid = getpid();
 
-SmallShell::SmallShell(std::string prompt) : m_pid(getpid()), m_prompt(prompt)
+SmallShell::SmallShell(std::string prompt) : m_prompt(prompt)
 {
   m_prevDir = (char *)malloc((MAX_PATH_LENGTH + 1) * sizeof(char));
   strcpy(m_prevDir, "");

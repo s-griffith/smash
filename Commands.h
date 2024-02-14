@@ -732,7 +732,7 @@ public:
    * m_currDir: The current directory
    * jobs: The list of jobs in SmallShell
    */
-  const pid_t m_pid;
+  static pid_t m_pid;
   int m_pid_fg = 0;
 private:
   std::string m_prompt;
