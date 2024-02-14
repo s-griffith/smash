@@ -800,11 +800,6 @@ Command::~Command()
   m_cmd_line = nullptr;
 }
 
-const char *Command::gedCmdLine()
-{
-  return this->m_cmd_line;
-}
-
 //-------------------------------------BuiltInCommand-------------------------------------
 
 BuiltInCommand::BuiltInCommand(const char *cmd_line) : Command::Command(cmd_line) {}

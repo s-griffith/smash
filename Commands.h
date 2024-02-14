@@ -8,100 +8,314 @@
 #define COMMAND_MAX_ARGS (20)
 #define MAX_PATH_LENGTH (80)
 
+/*
+ *  Command Class:
+ *  This class represents a single Command of SmallShell.
+ */
 class Command
 {
-protected:
-  const char *m_cmd_line;
-
 public:
+  /*
+   * Constructor of Command class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of Command.
+   */
   Command(const char *cmd_line);
+
+  /*
+   * Destructor of the Command class
+   */
   virtual ~Command();
+
+  /*
+   * Execute function of the Command class:
+   * Executes the command based on its type according to the appropriate child class.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   virtual void execute() = 0;
-  const char *gedCmdLine();
-  // virtual void prepare();
-  // virtual void cleanup();
-  //  TODO: Add your extra methods if needed
+
+protected:
+  /*
+   * The internal field associated with a Command:
+   * m_cmd_line: The CMD line received from the user
+   */
+  const char *m_cmd_line;
 };
 
+/*
+ *  BuiltInCommand Class:
+ *  This class represents a built-in Command of SmallShell.
+ */
 class BuiltInCommand : public Command
 {
 public:
+  /*
+   * Constructor of BuiltInCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of BuiltInCommand.
+   */
   BuiltInCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the BuiltInCommand class
+   */
   virtual ~BuiltInCommand() = default;
 };
 
+/*
+ *  ExternalCommand Class:
+ *  This class represents an external Command of SmallShell.
+ */
 class ExternalCommand : public Command
 {
 public:
+  /*
+   * Constructor of ExternalCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of ExternalCommand.
+   */
   ExternalCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the ExternalCommand class
+   */
   virtual ~ExternalCommand() {}
+
+  /*
+   * Execute function of the ExternalCommand class:
+   * Executes the external command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+
+/*
+ *  PipeCommand Class:
+ *  This class represents a pipe Command of SmallShell.
+ */
 class PipeCommand : public Command
 {
-  // TODO: Add your data members
 public:
+
+  /*
+   * Constructor of PipeCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of PipeCommand.
+   */
   PipeCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the PipeCommand class
+   */
   virtual ~PipeCommand() {}
+
+  /*
+   * Execute function of the PipeCommand class:
+   * Executes the pipe command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+/*
+ *  RedirectionCommand Class:
+ *  This class represents a redirection Command of SmallShell.
+ */
 class RedirectionCommand : public Command
 {
-  // TODO: Add your data members
 public:
+
+  /*
+   * Constructor of RedirectionCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of RedirectionCommand.
+   */
   explicit RedirectionCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the RedirectionCommand class
+   */
   virtual ~RedirectionCommand() {}
+
+  /*
+   * Execute function of the RedirectionCommand class:
+   * Executes the redirection command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
-  // void prepare() override;
-  // void cleanup() override;
 };
 
+/*
+ *  ChangeDirCommand Class:
+ *  This class represents a cd Command of SmallShell.
+ */
 class ChangeDirCommand : public BuiltInCommand
 {
-  char **m_plastPwd;
-
 public:
+
+  /*
+   * Constructor of ChangeDirCommand class
+   * @param cmd_line - the given CMD line
+   * @param plastPwd - the previous directory
+   * @return
+   *      A new instance of ChangeDirCommand.
+   */
   ChangeDirCommand(const char *cmd_line, char **plastPwd);
+
+  /*
+   * Destructor of the ChangeDirCommand class
+   */
   virtual ~ChangeDirCommand() {}
+
+  /*
+   * Execute function of the ChangeDirCommand class:
+   * Executes the change directory command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
+
+private:
+  /*
+   * The internal field associated with a ChangeDirCommand:
+   * m_plastPwd: The last directory (last PWD)
+   */
+  char **m_plastPwd;
 };
 
+
+/*
+ *  GetCurrDirCommand Class:
+ *  This class represents a pwd Command of SmallShell.
+ */
 class GetCurrDirCommand : public BuiltInCommand
 {
 public:
+
+  /*
+   * Constructor of GetCurrDirCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of GetCurrDirCommand.
+   */
   GetCurrDirCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the GetCurrDirCommand class
+   */
   virtual ~GetCurrDirCommand() {}
+
+  /*
+   * Execute function of the GetCurrDirCommand class:
+   * Executes the get current directory (pwd) command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+/*
+ *  ShowPidCommand Class:
+ *  This class represents a showpid Command of SmallShell.
+ */
 class ShowPidCommand : public BuiltInCommand
 {
 public:
+
+  /*
+   * Constructor of ShowPidCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of ShowPidCommand.
+   */
   ShowPidCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the ShowPidCommand class
+   */
   virtual ~ShowPidCommand() {}
+
+  /*
+   * Execute function of the ShowPidCommand class:
+   * Executes the showpid command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+/*
+ *  ChangePromptCommand Class:
+ *  This class represents a chprompt Command of SmallShell.
+ */
 class ChangePromptCommand : public BuiltInCommand
 {
 public:
+
+  /*
+   * Constructor of ChangePromptCommand class
+   * @param cmd_line - the given CMD line
+   * @return
+   *      A new instance of ChangePromptCommand.
+   */
   explicit ChangePromptCommand(const char *cmd_line);
+
+  /*
+   * Destructor of the ChangePromptCommand class
+   */
   virtual ~ChangePromptCommand();
+
+  /*
+   * Execute function of the ChangePromptCommand class:
+   * Executes the chprompt command.
+   * Receives no parameters
+   * @return
+   *      void
+   */
   void execute() override;
 };
 
+/*
+ *  JobsList Class:
+ *  This class represents the list of jobs in SmallShell.
+ */
 class JobsList;
+
+
+/*
+ *  QuitCommand Class:
+ *  This class represents a quit Command of SmallShell.
+ */
 class QuitCommand : public BuiltInCommand
 {
-  // TODO: Add your data members public:
 public:
-  // const char* m_cmd_line;
-  JobsList *m_jobs;
   QuitCommand(const char *cmd_line, JobsList *jobs);
   virtual ~QuitCommand() {}
   void execute() override;
+
+private:
+  /*
+   * The internal field associated with a QuitCommand:
+   * m_jobs: The list of jobs in SmallShell
+   */
+  JobsList *m_jobs;
 };
 
 class JobsList
