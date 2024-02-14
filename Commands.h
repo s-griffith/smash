@@ -38,6 +38,15 @@ public:
   virtual void execute() = 0;
 
 protected:
+
+  /*
+   * Updates the current directory for the first time
+   * Receives no parameters
+   * @return
+   *      void
+   */
+  void firstUpdateCurrDir();
+
   /*
    * The internal field associated with a Command:
    * m_cmd_line: The CMD line received from the user

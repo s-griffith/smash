@@ -130,7 +130,7 @@ void deleteArgs(char **args)
   free(args);
 }
 
-void firstUpdateCurrDir()
+void Command::firstUpdateCurrDir()
 {
   SmallShell &smash = SmallShell::getInstance();
   char *buffer = (char *)malloc(MAX_PATH_LENGTH * sizeof(char) + 1);
@@ -636,7 +636,6 @@ void JobsList::sigJobById(int jobId, int signum)
   }
   cout << "signal number " << signum << " was sent to pid " << job->m_pid << endl;
 }
-// JobsList(){}
 
 //-------------------------------------ForeGround-------------------------------------
 ForegroundCommand::ForegroundCommand(const char *cmd_line, JobsList *jobs) : BuiltInCommand(cmd_line), m_jobs(jobs) {}
@@ -854,7 +853,6 @@ void GetCurrDirCommand::execute()
 
 ChangeDirCommand::ChangeDirCommand(const char *cmd_line, char **plastPwd) : BuiltInCommand(cmd_line), m_plastPwd(plastPwd) {}
 
-/// TODO: IF WANT TO MAKE THINGS MORE EFFICIENT - TRY TO SPLICE TOGETHER CURRDIR INSTEAD OF USING SYSCALL
 void ChangeDirCommand::execute()
 {
   SmallShell &smash = SmallShell::getInstance();
@@ -917,7 +915,6 @@ void ChangeDirCommand::execute()
   else
   {
     smash.setPrevDir();
-    // Figure out how to move the string into a char without allocating memory here and not being able to delete it
     smash.setCurrDir(smash.getCurrDir(), args[1]);
   }
   deleteArgs(args);
