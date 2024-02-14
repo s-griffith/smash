@@ -1078,7 +1078,7 @@ void SmallShell::setCurrDir(char *currDir, char *toCombine)
     return;
   }
   strcpy(temp, currDir);
-  if (strcmp(currDir, '/') != 0) {
+  if (strcmp(currDir, "/") != 0) {
     strcat(temp, "/");
   }
   strcat(temp, toCombine);
