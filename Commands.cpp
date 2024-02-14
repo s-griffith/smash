@@ -148,28 +148,14 @@ void deleteArgs(char **args)
 
 /*
  * Checks whether a given path is a full or partial path
- * @param currPath - the current path
  * @param newPath - the new path
  * @return
  *      bool - whether the new path is a full path
  */
-bool checkFullPath(char *currPath, char *newPath)
+bool checkFullPath(char *newPath)
 {
   if (newPath[0] == '/')
     return true;
-  // int i = 0;
-  // int minLen = min(string(currPath).length(), string(newPath).length());
-  // for (; i < minLen; i++)
-  // {
-  //   if (currPath[i] != newPath[i])
-  //   {
-  //     break;
-  //   }
-  // }
-  // if (i > 1)
-  // {
-  //   return true;
-  // }
   return false;
 }
 
@@ -941,7 +927,7 @@ void ChangeDirCommand::execute()
   }
   // If the new path is the full path, set currDir equal to it
 
-  if (checkFullPath(smash.getCurrDir(), args[1]))
+  if (checkFullPath(args[1]))
   {
     smash.setPrevDir();
     smash.setCurrDir(args[1]);
