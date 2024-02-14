@@ -691,13 +691,13 @@ void RedirectionCommand::execute()
       {
         perror("smash error: close failed");
         deleteArgs(args);
-        exit(0);
+        return;
       }
       if (open(args[i + 1], O_WRONLY | O_APPEND | O_CREAT, 0777) == SYS_FAIL)
       {
         perror("smash error: open failed");
         deleteArgs(args);
-        exit(0);
+        return;
       }
       break;
     }
@@ -708,20 +708,20 @@ void RedirectionCommand::execute()
       {
         perror("smash error: close failed");
         deleteArgs(args);
-        exit(0);
+        return;
       }
       if (open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0777) == SYS_FAIL)
       {
         perror("smash error: open failed");
         deleteArgs(args);
-        exit(0);
+        return;
       }
       break;
     }
   }
   smash.executeCommand(cmd);
   deleteArgs(args);
-  exit(0);
+  return;
 }
 
 //--------------------------------------------------------Pipe----------------------------------------------------------
@@ -1039,7 +1039,7 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
-  if (dynamic_cast<QuitCommand *>(cmd) != nullptr)
+  if (dynamic_cast<QuitCommand *>(cmd) != nullptr || dynamic_cast<RedirectionCommand *>(cmd) != nullptr)
   {
     delete cmd;
     exit(0);
