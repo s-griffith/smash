@@ -100,6 +100,13 @@ void _removeBackgroundSign(char *cmd_line)
 
 //-------------------------------------Helper Functions-------------------------------------
 
+/*
+ * Parses/Extracts each individual argument and command
+ * @param cmd_line - the CMD line received
+ * @param numArgs - an int value to be filled with the number of args discovered
+ * @return
+ *      char** - an array of arguments
+ */
 char **getArgs(const char *cmd_line, int *numArgs)
 {
   // Remove background sign if exists:
@@ -108,47 +115,44 @@ char **getArgs(const char *cmd_line, int *numArgs)
   _removeBackgroundSign(cmd);
   const char *cmd_line_clean = cmd;
 
+  // Parse arguments:
   char **args = (char **)malloc((COMMAND_ARGS_MAX_LENGTH + 1) * sizeof(char *));
-
   if (args == nullptr)
   {
     perror("smash error: malloc failed");
     free(args);
     return nullptr;
   }
+  // Initialize args to avoid valgrind errors:
   std::fill_n(args, COMMAND_ARGS_MAX_LENGTH + 1, nullptr);
   *numArgs = _parseCommandLine(cmd_line_clean, args);
   return args;
 }
 
+/*
+ * Delete the args array received from getArgs()
+ * @param args - the args array
+ * @return
+ *      void
+ */
 void deleteArgs(char **args)
 {
+  // Delete each argument in args:
   for (int i = 0; i < COMMAND_MAX_ARGS + 1; i++)
   {
     free(args[i]);
   }
+  // Delete args itself:
   free(args);
 }
 
-void Command::firstUpdateCurrDir()
-{
-  SmallShell &smash = SmallShell::getInstance();
-  char *buffer = (char *)malloc(MAX_PATH_LENGTH * sizeof(char) + 1);
-  if (!buffer)
-  {
-    free(buffer);
-    perror("smash error: malloc failed");
-  }
-  buffer = getcwd(buffer, MAX_PATH_LENGTH);
-  if (!buffer)
-  {
-    free(buffer);
-    perror("smash error: getcwd failed");
-  }
-  smash.setCurrDir(buffer);
-  free(buffer);
-}
-
+/*
+ * Checks whether a given path is a full or partial path
+ * @param currPath - the current path
+ * @param newPath - the new path
+ * @return
+ *      bool - whether the new path is a full path
+ */
 bool checkFullPath(char *currPath, char *newPath)
 {
   if (newPath[0] == '/')
@@ -169,6 +173,12 @@ bool checkFullPath(char *currPath, char *newPath)
   return false;
 }
 
+/*
+ * Splices a given directory to "go up" (remove last directory)
+ * @param dir - the current directory
+ * @return
+ *      char* - a pointer to the directory after "going up"
+ */
 char *goUp(char *dir)
 {
   if (!strcmp(dir, "/"))
@@ -180,10 +190,15 @@ char *goUp(char *dir)
   return dir;
 }
 
+/*
+ * Checks if the string received is a number
+ * @param s - the string received
+ * @return
+ *      bool - whether the string is a number
+ */
 bool is_number(const std::string &s)
 {
   std::string::const_iterator it = s.begin();
-  // if(*it == '-') ++it; //negative number
   while (it != s.end() && (std::isdigit(*it) || *it == '-'))
     ++it;
   return !s.empty() && it == s.end();
@@ -350,11 +365,12 @@ void SmallShell::executeCommand(const char *cmd_line)
     return;
   }
   cmd->execute();
-  if (dynamic_cast<QuitCommand*>(cmd) != nullptr) {
+  if (dynamic_cast<QuitCommand *>(cmd) != nullptr)
+  {
     delete cmd;
     exit(0);
   }
-    delete cmd;// Please note that you must fork smash process for some commands (e.g., external commands....)
+  delete cmd; // Please note that you must fork smash process for some commands (e.g., external commands....)
 }
 
 std::string SmallShell::getPrompt() const
@@ -729,7 +745,7 @@ void QuitCommand::execute()
     m_jobs->killAllJobs();
   }
   deleteArgs(args);
-  //exit(0);
+  // exit(0);
 }
 
 //-------------------------------------Kill-------------------------------------
@@ -797,6 +813,25 @@ Command::Command(const char *cmd_line) : m_cmd_line(cmd_line) {}
 Command::~Command()
 {
   m_cmd_line = nullptr;
+}
+
+void Command::firstUpdateCurrDir()
+{
+  SmallShell &smash = SmallShell::getInstance();
+  char *buffer = (char *)malloc(MAX_PATH_LENGTH * sizeof(char) + 1);
+  if (!buffer)
+  {
+    free(buffer);
+    perror("smash error: malloc failed");
+  }
+  buffer = getcwd(buffer, MAX_PATH_LENGTH);
+  if (!buffer)
+  {
+    free(buffer);
+    perror("smash error: getcwd failed");
+  }
+  smash.setCurrDir(buffer);
+  free(buffer);
 }
 
 //-------------------------------------BuiltInCommand-------------------------------------
