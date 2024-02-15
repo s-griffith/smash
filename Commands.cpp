@@ -824,12 +824,13 @@ void ChmodCommand::execute()
     deleteArgs(args);
     return;
   }
-  permissionsNum = stoi(args[1], nullptr, 8);
-  if ((permissionsNum < 0 || permissionsNum > 0777) && !(permissionsNum <= 04777 && permissionsNum >= 04000))
+  try
   {
-    cerr << "smash error: chmod: invalid arguments" << endl;
-    deleteArgs(args);
-    return;
+    permissionsNum = stoi(args[1], nullptr, 8);
+  }
+  catch (exception &)
+  {
+    permissionsNum = stoi(args[1], nullptr);
   }
   if (chmod(args[2], permissionsNum) == SYS_FAIL)
   {
@@ -1078,7 +1079,8 @@ void SmallShell::setCurrDir(char *currDir, char *toCombine)
     return;
   }
   strcpy(temp, currDir);
-  if (strcmp(currDir, "/") != 0) {
+  if (strcmp(currDir, "/") != 0)
+  {
     strcat(temp, "/");
   }
   strcat(temp, toCombine);
